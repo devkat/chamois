@@ -1,5 +1,5 @@
 import sbt._, Keys._
-import atd.sbtliquibase.LiquibasePlugin._
+import com.github.bigtoast.sbtliquibase.LiquibasePlugin._
 import com.github.siasia.WebPlugin._
 import com.github.siasia.PluginKeys._
 
@@ -57,7 +57,7 @@ object BuildSettings {
 
 object ChamoisBuild extends Build {
 
-  val liftVersion = "2.5-M2"
+  val liftVersion = "2.5-M4"
 
   lazy val root = Project("chamois", file("."),
     settings = BuildSettings.buildSettings ++ Seq(
@@ -73,6 +73,8 @@ object ChamoisBuild extends Build {
         //"net.liftmodules" %% "lift-openid" % liftVersion % "compile->default",
         "net.liftmodules" %% "openid" % "2.5-M1-1.1" excludeAll(ExclusionRule(organization = "net.liftweb")),
         "net.liftweb" %% "lift-squeryl-record" % liftVersion,
+        "net.devkat" % "dgrid-lift" % "1.0-SNAPSHOT",
+        "ch.becompany" % "fugue-icons-lift" % "3.4.1",
         "eu.getintheloop" %% "lift-shiro" % "0.0.6-SNAPSHOT",
         "net.databinder.dispatch" %% "dispatch-core" % "0.9.4",
         "commons-collections" % "commons-collections" % "3.2.1",
@@ -88,16 +90,12 @@ object ChamoisBuild extends Build {
     )
     ++ net.virtualvoid.sbt.graph.Plugin.graphSettings
     ++ webSettings
-    ++ Seq(
-      (webappResources in Compile) <+= (resourceManaged in Compile) apply { r => file(r.getAbsolutePath() + "/webapp")}
-    )
-    ++ net.virtualvoid.sbt.graph.Plugin.graphSettings
     ++ liquibaseSettings ++ Seq (
       liquibaseUrl := "jdbc:postgresql:chamois",
       liquibaseDriver := "org.postgresql.Driver",
       liquibaseUsername := "chamois",
       liquibasePassword := "chamois",
-      liquibaseChangelog := "web/src/main/migrations/changelog.xml"
+      liquibaseChangelog := "src/main/migrations/changelog.xml"
     )
   )
   

@@ -1,0 +1,42 @@
+<div class="lift:surround?with=default;at=content">
+
+  <head_merge>
+  <!--  
+   <script type="text/javascript" src="/static/js/gui/repositories.js"></script>
+   -->
+   <script type="text/javascript">
+     require(['gui/repositories']);
+   </script>
+  </head_merge>
+  
+  <div class="row">
+    <div class="span4">
+      <h2>Repositories</h2>
+      <div id="repositories-toolbar">
+        <a href="#dialog-new-repository" role="button" class="btn" data-toggle="modal">New</a>
+      </div>
+      <div id="repositories"></div>
+    </div>
+  </div>
+
+  <div id="dialog-new-repository" class="modal hide fade" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>New repository</h3>
+    </div>
+    <div class="modal-body">
+      <form>
+        <fieldset>
+          <label>Name</label>
+          <input name="name" type="text" placeholder="Name"/>
+        </fieldset>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <a id="dialog-cancel" href="#" class="btn">Cancel</a>
+      <a id="dialog-submit" href="#" class="btn btn-primary">Submit</a>
+    </div>
+  </div>
+
+</div>
+

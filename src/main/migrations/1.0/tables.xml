@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+  <changeSet id="1" author="devkat">
+  
+    <createTable tableName="role">
+      <column name="id" type="int" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(30)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+    </createTable>
+  
+    <createTable tableName="users">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="email" type="varchar(50)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="password_hash" type="varchar(128)"/>
+      <column name="password_salt" type="bytea"/>
+      <column name="created" type="${type.timestamp}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="user_to_role">
+      <column name="user_id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" references="users(id)" foreignKeyName="user_to_role__user_id"/>
+      </column>
+      <column name="role_id" type="int">
+        <constraints primaryKey="true" references="role(id)" foreignKeyName="user_to_role__role_id"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="repository">
+      <column name="id" type="int" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="slug" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="${type.timestamp}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="document">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="repository_id" type="int">
+        <constraints nullable="false"/>
+      </column>
+      <column name="name" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint constraintName="document_repository_id__repository_id"
+      baseTableName="document" baseColumnNames="repository_id"
+      referencedTableName="repository" referencedColumnNames="id"/>
+ 
+    <createTable tableName="version">
+      <column name="document_id" type="bigint">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="number" type="int">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="content" type="bytea">
+        <constraints nullable="false"/>
+      </column>
+      <column name="media_type" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="content_length" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="${type.timestamp}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addUniqueConstraint tableName="version" columnNames="document_id, number"/>
+    <addForeignKeyConstraint constraintName="version_document_id__document_id"
+      baseTableName="version" baseColumnNames="document_id"
+      referencedTableName="document" referencedColumnNames="id"/>
+ 
+    <createTable tableName="folder">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="parent_id" type="bigint"/>
+      <column name="document_id" type="bigint">
+        <constraints foreignKeyName="folder_document_id__document_id" references="document(id)"/>
+      </column>
+      <column name="created" type="${type.timestamp}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint constraintName="folder_parent_id__parent_id"
+      baseTableName="folder" baseColumnNames="parent_id"
+      referencedTableName="folder" referencedColumnNames="id"/>
+
+    <createTable tableName="root_folder">
+      <column name="repository_id" type="int">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="folder_id" type="bigint">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint constraintName="root_folder_repository_id__repository_id"
+      baseTableName="root_folder" baseColumnNames="repository_id"
+      referencedTableName="repository" referencedColumnNames="id"/>
+    <addForeignKeyConstraint constraintName="root_folder_folder_id__folder_id"
+      baseTableName="root_folder" baseColumnNames="folder_id"
+      referencedTableName="folder" referencedColumnNames="id"/>
+      
+    <!--
+    <createTable tableName="document_to_folder">
+      <column name="document_id" type="bigint">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="folder_id" type="bigint">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint constraintName="document_to_folder_document_id__document_id"
+      baseTableName="document_to_folder" baseColumnNames="document_id"
+      referencedTableName="document" referencedColumnNames="id"/>
+    <addForeignKeyConstraint constraintName="document_to_folder_document_id__folder_id"
+      baseTableName="document_to_folder" baseColumnNames="folder_id"
+      referencedTableName="folder" referencedColumnNames="id"/>
+      -->
+
+  </changeSet>
+
+</databaseChangeLog>

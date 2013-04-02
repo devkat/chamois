@@ -1,0 +1,77 @@
+<div class="lift:surround?with=default;at=content">
+
+  <head_merge>
+   <script type="text/javascript">
+     require(['gui/repository']);
+    </script>
+  </head_merge>
+  
+  <div class="row">
+    <div class="span4">
+      <h2>Documents</h2>
+      <div class="btn-group chm-toolbar">
+        <a href="#" role="button" class="btn dropdown-toggle" data-toggle=dropdown>
+          New <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="#dialog-new-document" data-toggle="modal">HTML document</a></li>
+          <li><a href="#dialog-new-image" data-toggle="modal">Image</a></li>
+        </ul>
+      </div>
+      <div id="documents"></div>
+    </div>
+    <div class="span8">
+      <h2>Edit</h2>
+    </div>
+  </div>
+
+  <div id="dialog-new-document" class="modal hide fade" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>New document</h3>
+    </div>
+    <form method="post" action="/api/document/">
+      <div class="modal-body">
+        <fieldset>
+          <input type="hidden" name="repositoryId"/>
+          <label>Name</label>
+          <input name="name" type="text"/>
+        </fieldset>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn chm-cancel">Cancel</a>
+        <!--  
+        <a href="#" class="btn btn-primary chm-submit">Submit</a>
+        -->
+        <input type="submit" class="btn" value="Submit"/>
+      </div>
+    </form>
+  </div>
+
+  <div id="dialog-new-image" class="modal hide fade" role="dialog" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>New image</h3>
+    </div>
+    <form method="post" action="/api/document/">
+      <div class="modal-body">
+        <fieldset>
+          <input type="hidden" name="repositoryId"/>
+          <label for="name">Name</label>
+          <input name="name" type="text"/>
+          <label for="file">File</label>
+          <input name="file" type="file"/>
+        </fieldset>
+      </div>
+      <div class="modal-footer">
+        <a href="#" class="btn chm-cancel">Cancel</a>
+        <!--  
+        <a href="#" class="btn btn-primary chm-submit">Submit</a>
+        -->
+        <input type="submit" class="btn" value="Submit"/>
+      </div>
+    </form>
+  </div>
+
+</div>
+

@@ -8,7 +8,7 @@ addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.1.0")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.6.0")
 
-addSbtPlugin("atd" % "sbt-liquibase" % "0.4")
+addSbtPlugin("com.github.bigtoast" % "sbt-liquibase" % "0.5")
 
 autoCompilerPlugins := true
 
