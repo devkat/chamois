@@ -13,39 +13,38 @@ import net.liftweb.json.JField
 import net.liftweb.json.JValue
 import net.liftweb.json.JArray
 
-case class Document private() extends Record[Document] with KeyedRecord[Long] {
+case class Document private() extends Record[Document] with KeyedRecord[String] {
 
   override def meta = Document
   
-  @Column(name="id")
-  override val idField = new LongField(this)
+  @Column(name="uuid")
+  override val idField = new StringField(this, 36)
+  
+  def uuid = idField
     
   val name = new StringField(this, 256)
   
-  @Column(name="repository_id")
-  val repositoryId = new LongField(this);
-  
-  def unapply(idstr:String): Option[Document] =
-    try {
-      Document.findById(idstr.toInt)
-    } catch {
-      case _ => None
-    }
+  def unapply(uuid:String): Option[Document] =
+    Document.findByUuid(uuid)
   
   def unapply(json: JValue): Option[Document] =
     Document.fromJValue(json)
+    
+  def versions = documentToVersions.left(this)
 
   def currentVersion =
     Version.findLatestVersion(idField.get)
     
   def delete_! = documents.delete(this.id)
   
+  def node = from(nodes)(n => where(n.documentUuid === Some(uuid.get)).select(n)).headOption.get
+  
 }
 
 object Document extends Document with MetaRecord[Document] {
   
-  def findById(id:Long): Option[Document] =
-    from(documents)(d => where(d.id === id) select(d)).headOption
+  def findByUuid(uuid:String): Option[Document] =
+    from(documents)(d => where(d.uuid === uuid) select(d)).headOption
 
   def findAll: List[Document] =
     from(documents)(d => select(d)).toList
@@ -53,7 +52,7 @@ object Document extends Document with MetaRecord[Document] {
   protected def encodeAsJSON_! (toEncode: Document): JsonAST.JObject = {
     toEncode.runSafe {
       JsonAST.JObject(
-        List(JField("id", toEncode.idField.asJValue))
+        List(JField("uuid", toEncode.uuid.asJValue))
       )
     }
   }

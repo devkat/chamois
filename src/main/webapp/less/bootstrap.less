@@ -1,0 +1,36 @@
+
+// server-side compilation
+//@import "../../../../../target/scala-2.10/resource_managed/main/webapp/vendor/bootstrap/less/bootstrap.less";
+
+// client-side compilation
+@import "/vendor/bootstrap/less/bootstrap.less";
+
+body {
+  padding-top: 60px;
+}
+
+.row-space {
+  margin: 40px 0;
+}
+
+
+ul.tree {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+ul.tree ul.tree {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+ul.tree li {
+}
+
+ul.tree .collapse-trigger {
+  cursor: pointer;
+}
+
+ul.tree .current {
+  font-weight: bold;
+}

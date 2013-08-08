@@ -1,0 +1,34 @@
+<div class="row">
+  <div class="col-lg-12">
+    <wizard:wizard_top> <div> <wizard:bind></wizard:bind> </div> </wizard:wizard_top> 
+    <wizard:screen_top> <h2> <wizard:bind></wizard:bind> </h2> </wizard:screen_top> 
+    <wizard:errors>
+      <wizard:item class="text-error">
+        <p><wizard:bind/></p>
+      </wizard:item>
+    </wizard:errors>
+    <wizard:fields>
+      <fieldset>
+      <div class="form-group" lift:bind="wizard:line">
+        <wizard:label>
+          <label wizard:for=""><wizard:bind></wizard:bind></label>
+        </wizard:label>
+        <wizard:help><span><wizard:bind></wizard:bind></span></wizard:help>
+        <wizard:form class="form-control"></wizard:form>
+        <wizard:field_errors>
+          <span class="help-block has-error">
+            <wizard:error><wizard:bind></wizard:bind></wizard:error>
+          </span>
+        </wizard:field_errors> 
+      </div>
+      </fieldset>
+    </wizard:fields>
+    <div class="form-group">
+      <wizard:prev></wizard:prev> 
+      <wizard:cancel></wizard:cancel> 
+      <wizard:next></wizard:next> 
+    </div>
+    <wizard:screen_bottom><div><wizard:bind></wizard:bind></div></wizard:screen_bottom> 
+    <wizard:wizard_bottom><div><wizard:bind></wizard:bind></div></wizard:wizard_bottom>
+  </div> 
+</div>

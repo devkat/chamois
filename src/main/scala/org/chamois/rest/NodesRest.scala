@@ -1,26 +1,36 @@
 package org.chamois.rest
 import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.json.JString
+import net.liftweb.json._
 import net.liftweb.json.JArray
+import net.liftweb.json.JsonAST._
+import net.liftweb.json.JsonDSL._
 import org.chamois.model.Document
-import net.liftweb.json.JValue
-import net.liftweb.json.JBool
 import net.liftweb.common._
 import scala.xml.NodeSeq
 import net.liftweb.util.Html5
 import scala.xml.Elem
-import org.chamois.model.Document
+import org.chamois.model.Node
 import org.chamois.model.ChamoisDb
-import org.chamois.model.Version
 import org.apache.tika.io.IOUtils
 import org.apache.tika.Tika
 import net.liftweb.squerylrecord.RecordTypeMode._
 
-object DocumentsRest extends RestHelper { //}RestService[Document]("document") {
-  /*
+object NodesRest extends RestHelper { //}RestService[Document]("document") {
   import ChamoisDb._
   
+  implicit def toJson(node:Node): JObject = {
+    ("data" -> node.slug.get) ~
+    ("children" -> node.children)
+  }
+  
+  serve( "api" / "node" prefix {
+    
+    case Nil JsonGet _ => Node.rootNodes.toList: JArray
+    
+  })
+  
+  /*
   lazy val tika = new Tika();
 
   serve( "api" / "document" prefix {

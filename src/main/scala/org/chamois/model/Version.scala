@@ -15,16 +15,16 @@ import org.squeryl.KeyedEntity
 import org.squeryl.Query
 
 case class Version private() extends Record[Version]
-    with KeyedEntity[CompositeKey2[LongField[Version], IntField[Version]]] {
+    with KeyedEntity[CompositeKey2[StringField[Version], IntField[Version]]] {
 
   override def meta = Version
   
-  @Column(name="document_id")
-  val documentId = new LongField(this)
+  @Column(name="uuid")
+  val uuid = new StringField(this, 36)
   
   val number = new IntField(this)
   
-  def id = compositeKey(documentId, number)
+  def id = compositeKey(uuid, number)
     
   val created = new DateTimeField(this)
   val content = new BinaryField(this)
@@ -46,13 +46,13 @@ case class Version private() extends Record[Version]
 
 object Version extends Version with MetaRecord[Version] {
   
-  def findLatestVersion(docId:Long): Option[Version] =
-    from(versions)(v => where(v.documentId === docId) select(v) orderBy(v.number).desc).page(0, 1).headOption
+  def findLatestVersion(uuid:String): Option[Version] =
+    from(versions)(v => where(v.uuid === uuid) select(v) orderBy(v.number).desc).page(0, 1).headOption
     
-  def newVersion(docId:Long): Version = {
+  def newVersion(uuid:String): Version = {
     val version = Version.createRecord
-    version.documentId.set(docId)
-    val num = from(versions)(v => where(v.documentId === docId) compute(max(v.number))):Option[Int]
+    version.uuid.set(uuid)
+    val num = from(versions)(v => where(v.uuid === uuid) compute(max(v.number))):Option[Int]
     version.number.set(num match {
       case Some(n) => n + 1
       case None => 0

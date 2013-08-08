@@ -20,8 +20,7 @@ import org.chamois.auth.ChamoisOpenIdVendor
 import org.chamois.sitemap._
 import net.liftweb.sitemap.Menu.Menuable
 import net.liftweb.sitemap.Loc.MenuCssClass
-import org.chamois.rest.DocumentsRest
-import org.chamois.rest.RepositoriesRest
+import org.chamois.rest._
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -46,9 +45,8 @@ class Boot {
     LiftRules.dispatch.append(ChamoisOpenIdVendor.dispatchPF)
     LiftRules.snippets.append(ChamoisOpenIdVendor.snippetPF)
     
-    LiftRules.dispatch.append(DocumentsRest)
-    LiftRules.dispatch.append(RepositoriesRest)
-
+    LiftRules.statelessDispatch.append(NodesRest)
+    
     val staticFiles: PartialFunction[Req, Boolean] = {
       case Req("static" :: _, _, _) => false
     }
@@ -71,10 +69,10 @@ class Boot {
       ),
       //Menu("Role Test") / "restricted" >> RequireAuthentication >> HasRole("admin"),
       Menu("Sign up") / "signup" >> RequireNoAuthentication >> Loc.Hidden,
-      Menu("repositories", "Repositories") / "repositories" >> DefaultLogin,
-      Menu(RepositoryLoc), // >> RequireAuthentication
-      Menu("About") / "about" >> Hidden >> LocGroup("footer"),
-      Menu("Static") / "static" / ** >> Hidden
+      Menu(DocumentLoc), // >> RequireAuthentication
+      Menu.i("Create document") / "create-document",
+      Menu.i("Import from Lenya") / "import-lenya",
+      Menu("About") / "about" >> Hidden >> LocGroup("footer")
     )
     
     def addCssClass(c:ConvertableToMenu) = c match {

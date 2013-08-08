@@ -40,38 +40,17 @@
       </column>
     </createTable>
     
-    <createTable tableName="repository">
-      <column name="id" type="int" autoIncrement="true">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="name" type="varchar(256)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="slug" type="varchar(256)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="created" type="${type.timestamp}">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    
     <createTable tableName="document">
-      <column name="id" type="bigint" autoIncrement="true">
+      <column name="uuid" type="char(36)">
         <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="repository_id" type="int">
-        <constraints nullable="false"/>
       </column>
       <column name="name" type="varchar(256)">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addForeignKeyConstraint constraintName="document_repository_id__repository_id"
-      baseTableName="document" baseColumnNames="repository_id"
-      referencedTableName="repository" referencedColumnNames="id"/>
  
     <createTable tableName="version">
-      <column name="document_id" type="bigint">
+      <column name="uuid" type="char(36)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="number" type="int">
@@ -90,61 +69,46 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="version" columnNames="document_id, number"/>
-    <addForeignKeyConstraint constraintName="version_document_id__document_id"
-      baseTableName="version" baseColumnNames="document_id"
-      referencedTableName="document" referencedColumnNames="id"/>
+    <addUniqueConstraint tableName="version" columnNames="uuid, number"/>
+    <addForeignKeyConstraint constraintName="version__uuid"
+      baseTableName="version" baseColumnNames="uuid"
+      referencedTableName="document" referencedColumnNames="uuid"/>
  
-    <createTable tableName="folder">
+    <createTable tableName="node">
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="name" type="varchar(256)">
+      <column name="slug" type="varchar(256)">
         <constraints nullable="false"/>
       </column>
       <column name="parent_id" type="bigint"/>
-      <column name="document_id" type="bigint">
-        <constraints foreignKeyName="folder_document_id__document_id" references="document(id)"/>
+      <column name="document_uuid" type="char(36)"/>
+      <column name="position" type="int">
+        <constraints nullable="false"/>
       </column>
       <column name="created" type="${type.timestamp}">
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addForeignKeyConstraint constraintName="folder_parent_id__parent_id"
-      baseTableName="folder" baseColumnNames="parent_id"
-      referencedTableName="folder" referencedColumnNames="id"/>
+    <addForeignKeyConstraint constraintName="node__parent_id"
+      baseTableName="node" baseColumnNames="parent_id"
+      referencedTableName="node" referencedColumnNames="id"/>
+    <addForeignKeyConstraint constraintName="node__document_uuid"
+      baseTableName="node" baseColumnNames="document_uuid"
+      referencedTableName="document" referencedColumnNames="uuid"/>
 
-    <createTable tableName="root_folder">
-      <column name="repository_id" type="int">
+    <createTable tableName="version_to_tag">
+      <column name="uuid" type="char(36)">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="folder_id" type="bigint">
+      <column name="number" type="int">
         <constraints primaryKey="true" nullable="false"/>
       </column>
+      <column name="tag" type="text"/>
     </createTable>
-    <addForeignKeyConstraint constraintName="root_folder_repository_id__repository_id"
-      baseTableName="root_folder" baseColumnNames="repository_id"
-      referencedTableName="repository" referencedColumnNames="id"/>
-    <addForeignKeyConstraint constraintName="root_folder_folder_id__folder_id"
-      baseTableName="root_folder" baseColumnNames="folder_id"
-      referencedTableName="folder" referencedColumnNames="id"/>
-      
-    <!--
-    <createTable tableName="document_to_folder">
-      <column name="document_id" type="bigint">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="folder_id" type="bigint">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-    </createTable>
-    <addForeignKeyConstraint constraintName="document_to_folder_document_id__document_id"
-      baseTableName="document_to_folder" baseColumnNames="document_id"
-      referencedTableName="document" referencedColumnNames="id"/>
-    <addForeignKeyConstraint constraintName="document_to_folder_document_id__folder_id"
-      baseTableName="document_to_folder" baseColumnNames="folder_id"
-      referencedTableName="folder" referencedColumnNames="id"/>
-      -->
+    <addForeignKeyConstraint constraintName="version_to_tag__pk"
+      baseTableName="version_to_tag" baseColumnNames="uuid, number"
+      referencedTableName="version" referencedColumnNames="uuid, number"/>
 
   </changeSet>
 
