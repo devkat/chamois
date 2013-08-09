@@ -97,13 +97,25 @@ class ImportLenya extends BootstrapScreen {
       }
     }
     
-    println("Reading content file " + contentFile.getAbsolutePath)
+    println("Reading content file " + contentFile.getAbsolutePath + ", media type " + version.mediaType.get)
     //val content = Source.fromFile(contentFile).map(_.toByte).toArray
-    val in = new FileInputStream(contentFile)
-    val bytes = new Array[Byte](contentFile.length.toInt)
-    in.read(bytes)
-    in.close()
-    version.content.set(bytes)
+    
+    version.mediaType.get match {
+      case "application/xhtml+xml" => {
+        val content = <div>{XML.loadFile(contentFile) \ "body" \ "_"}</div>
+        val bytes = content.toString.getBytes("utf-8")
+        version.content.set(bytes)
+      }
+      case "IGNORE" => {
+        val in = new FileInputStream(contentFile)
+        val arr = new Array[Byte](contentFile.length.toInt)
+        in.read(arr)
+        in.close()
+        version.content.set(arr)
+      }
+      case _ => {}
+    }
+    
     
     versions.insert(version)
   }

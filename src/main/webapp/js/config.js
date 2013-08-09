@@ -9,7 +9,9 @@ var require = {
     jstree: '../vendor/jstree/jquery.jstree',
     'jquery.validation': '../vendor/jquery.validation/jquery.validate',
     jquery: '../vendor/jquery/jquery.min',
+    'jquery-migrate': '../vendor/jquery-migrate/jquery-migrate.min',
     jsrender: '../vendor/jsrender/jsrender',
+    mercury: '../vendor/mercury/distro/javascripts/mercury_loader',
     moment: '../vendor/moment/min/moment.min',
     sprintf: '../vendor/sprintf/src/sprintf.min',
     underscore: '../vendor/underscore/underscore-min'

@@ -18,11 +18,12 @@ import org.apache.tika.Tika
 import net.liftweb.squerylrecord.RecordTypeMode._
 
 object DocumentsRest extends RestHelper { //}RestService[Document]("document") {
-  /*
+  
   import ChamoisDb._
   
   lazy val tika = new Tika();
 
+  /*
   serve( "api" / "document" prefix {
     
     case Document(doc) :: Nil Get Req(_, "html", _) => doc.currentVersion match {
@@ -101,5 +102,5 @@ object DocumentsRest extends RestHelper { //}RestService[Document]("document") {
     case Document(doc) :: Nil JsonDelete _ => JBool(doc.delete_!)
     
   })
-  */
+ */ 
 }

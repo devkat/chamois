@@ -3,7 +3,8 @@ require([
   'underscore',
   'jstree',
   'bootstrap',
-  './gui'
+  './gui',
+  './mercury-editor'
 ], function(
   $,
   _

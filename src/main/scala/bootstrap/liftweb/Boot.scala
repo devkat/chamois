@@ -45,7 +45,9 @@ class Boot {
     LiftRules.dispatch.append(ChamoisOpenIdVendor.dispatchPF)
     LiftRules.snippets.append(ChamoisOpenIdVendor.snippetPF)
     
-    LiftRules.statelessDispatch.append(NodesRest)
+    List(MercuryRest) foreach {
+      LiftRules.statelessDispatch.append(_)
+    }
     
     val staticFiles: PartialFunction[Req, Boolean] = {
       case Req("static" :: _, _, _) => false

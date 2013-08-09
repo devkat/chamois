@@ -27,7 +27,7 @@ object Documents {
   
   def xmlContent(version:Version) =
     try {
-      XML.load(new ByteArrayInputStream(version.content.get)) \ "body" \ "_"
+      XML.load(new ByteArrayInputStream(version.content.get)) //\ "body" \ "_"
     }
     catch {
       case _:Throwable => <p>Could not load content.</p>
