@@ -1,15 +1,32 @@
 require([
   'jquery',
   'underscore',
-  'jstree',
+  './gui/tree',
   'bootstrap',
+  //'fuelux',
   './gui',
   './mercury-editor'
 ], function(
   $,
-  _
+  _,
+  tree
 ) {
   
+  $(document).ready(function() {
+    
+    var navtree = $('<ul>').attr('id', 'navtree');
+    $('#nav-trigger').popover({
+      html: true,
+      placement: 'bottom',
+      content: navtree
+    })
+    .on('show.bs.popover', function(evt) {
+      tree(navtree, { apiUrl: '/api/node', hrefUrl: '/document' });
+    });
+  });
+  
+  
+  /*
   $.jstree._themes = '/vendor/jstree/themes/';
   
   $(document).ready(function() {
@@ -28,5 +45,6 @@ require([
     });
     
   });
+   */
   
 });

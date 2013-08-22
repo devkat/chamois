@@ -14,25 +14,19 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 import net.liftweb.util.Helpers._
 import org.chamois.snippet.Nodes
 
-abstract class DocumentInfo
-case object NoSuchDocument extends DocumentInfo
-case class NodeOnly(node: Node) extends DocumentInfo
-case class FullDocumentInfo(doc: Document) extends DocumentInfo
+object DocumentLoc extends DocumentLocBase("document")
+object MercuryLoc extends DocumentLocBase("mercury")
 
-object DocumentLoc extends Loc[DocumentInfo] {
+class DocumentLocBase(val prefix:String) extends Loc[NodeInfo] {
   
   override def rewrite = Full(inTransaction {
-    case RewriteRequest(ParsePath("document" :: path, "", true, false), _, _) if path.size > 0 => inTransaction {
-      val node = Node.findByPath(path).get
-      //println("Node: " + node.path + ", " + node.documentUuid + ", " + node.document)
-      val docInfo = Node.findByPath(path) match {
-        case Some(node) => node.document match {
-          case Some(document) => FullDocumentInfo(document)
-          case None => NodeOnly(node)
-        }
-        case None => NoSuchDocument
+    case RewriteRequest(ParsePath(p :: path, "", true, false), _, _)
+        if p == prefix && path.size > 0 => inTransaction {
+      val nodeInfo = Node.findByPath(path) match {
+        case Some(node) => FullNodeInfo(node)
+        case None => NoSuchNode
       }
-      (RewriteResponse("document" :: Nil), docInfo)
+      (RewriteResponse(prefix :: Nil), nodeInfo)
     }
     /*
     case RewriteRequest(ParsePath(List("set", Repository(Repository)), "", true, false), _, _) => {
@@ -44,38 +38,40 @@ object DocumentLoc extends Loc[DocumentInfo] {
        */
   })
   
+  def withDoc(node:Node, f: Document => (NodeSeq => NodeSeq)) = node.document match {
+    case Some(doc) => f(doc)
+    case None => {ignore: NodeSeq => Text("Node has no document.")}
+  }
+  
   override def snippets = {
-  case ("show", Full(NoSuchDocument)) => {ignore: NodeSeq =>
-    Text("Document not found.")}
-  case ("show", Full(FullDocumentInfo(doc))) =>
-    Documents.show(doc) _
-  case ("tree", Full(FullDocumentInfo(doc))) => Nodes.tree(doc.node)
-  case ("tree", Full(NodeOnly(node))) => Nodes.tree(node)
-  case ("content", Full(FullDocumentInfo(doc))) => Documents.content(doc)
-  case ("meta", Full(FullDocumentInfo(doc))) => Documents.meta(doc)
-  case ("versions", Full(FullDocumentInfo(doc))) => Documents.versions(doc)
+  case ("breadcrumb", Full(FullNodeInfo(node))) => Nodes.breadcrumb(node) _
+  case ("tree", Full(FullNodeInfo(node))) => Nodes.tree(node)
+  case ("content", Full(FullNodeInfo(node))) => withDoc(node, Documents.content _)
+  case ("meta", Full(FullNodeInfo(node))) => withDoc(node, Documents.meta _)
+  case ("versions", Full(FullNodeInfo(node))) => withDoc(node, Documents.versions _)
+  case ("editLink", Full(FullNodeInfo(node))) => withDoc(node, Documents.editLink _)
   }
   
   override def params = Nil
   
   override def defaultValue = Empty
   
-  override def text = new Loc.LinkText[DocumentInfo](_ => Nil)
+  override def text = new Loc.LinkText[NodeInfo](_ => Nil)
   
-  override def link = new Loc.Link[DocumentInfo](List("document"), false) {
-    override def createLink(info: DocumentInfo) =
+  override def link = new Loc.Link[NodeInfo](List(prefix), false) {
+    override def createLink(info: NodeInfo) =
       info match {
-      case FullDocumentInfo(doc) => Full(Text(calcHref(info)))
+      case FullNodeInfo(doc) => Full(Text(calcHref(info)))
       case _ => Empty
     }
   }
   
-  override def calcHref(info:DocumentInfo) =
+  override def calcHref(info:NodeInfo) =
     info match {
-      case FullDocumentInfo(doc) => "/documents/" + doc.uuid
+      case FullNodeInfo(node) => (prefix ++ node.path).mkString("/")
     }
   
-  override def name = "document"
+  override def name = prefix
 
 }
 

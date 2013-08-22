@@ -13,6 +13,8 @@ import net.liftweb.common._
 import org.squeryl.dsl.CompositeKey2
 import org.squeryl.KeyedEntity
 import org.squeryl.Query
+import scala.xml.NodeSeq
+import java.io.ByteArrayInputStream
 
 case class Version private() extends Record[Version]
     with KeyedEntity[CompositeKey2[StringField[Version], IntField[Version]]] {
@@ -35,10 +37,23 @@ case class Version private() extends Record[Version]
   @Column(name="content_length")
   val contentLength = new LongField(this)
   
+  def document = documentToVersions.right(this).headOption.get
+  
+  def htmlPage(title:String, content:NodeSeq) =
+    <html>
+      <head>
+        <title>{title}</title>
+      </head>
+      <body>
+        {content}
+      </body>
+    </html>
+  
   def xmlContent = {
-    this.content.get match {
-      case null => <div><h1>Heading</h1><p>content</p></div>
-      case str => Html5.parse("<div>" + str + "</div>").get
+    this.mediaType.get.split("/").toList match {
+      case "application" :: "xhtml+xml" :: Nil =>
+        Html5.parse(new ByteArrayInputStream(content.get)).get
+      case str => htmlPage("Not an HTML page", <p>Not an HTML page</p>)
     }
   }
   

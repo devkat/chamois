@@ -29,6 +29,15 @@ class Node private() extends Record[Node] with KeyedRecord[Long] {
   
   def document = documentUuid.get.map(documents.lookup(_)).flatten
   def parent = parentId.get.map(nodes.lookup(_)).flatten
+  
+  /*
+  def existsChild(n:Node) = exists(from(nodes)(child => where(child.parentId === n.id) select(child.id)))
+  def hasChildren = from(nodes)(n => select(existsChild(n))).headOption.get.
+  */
+  def hasChildren = from(nodes)((child) =>
+    where(this.id === child.parentId)
+    compute(countDistinct(child.id))
+    ).single.measures > 0
 
   /*
   def parent = parentId.get match {
@@ -48,13 +57,15 @@ class Node private() extends Record[Node] with KeyedRecord[Long] {
 
 object Node extends Node with MetaRecord[Node] {
   
+  def unapply(path:List[String]) = findByPath(path)
+  
   def rootNodes =
     from(nodes)(n => where(n.parentId isNull) select(n))
     
   def findBySlug(slug:String, parent:Option[Node] = None) =
     parent match {
       case Some(parent) => from(nodes)(n => where(n.slug === slug and n.parentId === parent.id) select(n)).headOption
-      case None => from(nodes)(n => where(n.slug === slug) select(n)).headOption
+      case None => from(nodes)(n => where(n.slug === slug and (n.parentId isNull)) select(n)).headOption
     }
   
   def findByPath(path:List[String], parent:Option[Node] = None): Option[Node] =

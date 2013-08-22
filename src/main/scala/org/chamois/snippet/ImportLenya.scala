@@ -102,7 +102,14 @@ class ImportLenya extends BootstrapScreen {
     
     version.mediaType.get match {
       case "application/xhtml+xml" => {
-        val content = <div>{XML.loadFile(contentFile) \ "body" \ "_"}</div>
+        val content = <html lang={lang}>
+          <head>
+            <title>{doc.name.get}</title>
+          </head>
+          <body>
+            {XML.loadFile(contentFile) \ "body" \ "_"}
+          </body>
+        </html>
         val bytes = content.toString.getBytes("utf-8")
         version.content.set(bytes)
       }

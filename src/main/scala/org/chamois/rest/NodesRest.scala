@@ -19,14 +19,15 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 object NodesRest extends RestHelper { //}RestService[Document]("document") {
   import ChamoisDb._
   
-  implicit def toJson(node:Node): JObject = {
-    ("data" -> node.slug.get) ~
-    ("children" -> node.children)
-  }
+  implicit def toJson(node:Node) =
+    ("slug" -> node.slug.get) ~
+    ("hasChildren" -> node.hasChildren)
   
   serve( "api" / "node" prefix {
     
     case Nil JsonGet _ => Node.rootNodes.toList: JArray
+    
+    case Node(node) JsonGet _ => node.children: JArray
     
   })
   

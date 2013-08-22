@@ -45,7 +45,7 @@ class Boot {
     LiftRules.dispatch.append(ChamoisOpenIdVendor.dispatchPF)
     LiftRules.snippets.append(ChamoisOpenIdVendor.snippetPF)
     
-    List(MercuryRest) foreach {
+    List(DocumentsRest, MercuryRest, NodesRest) foreach {
       LiftRules.statelessDispatch.append(_)
     }
     
@@ -72,6 +72,7 @@ class Boot {
       //Menu("Role Test") / "restricted" >> RequireAuthentication >> HasRole("admin"),
       Menu("Sign up") / "signup" >> RequireNoAuthentication >> Loc.Hidden,
       Menu(DocumentLoc), // >> RequireAuthentication
+      Menu(MercuryLoc),
       Menu.i("Create document") / "create-document",
       Menu.i("Import from Lenya") / "import-lenya",
       Menu("About") / "about" >> Hidden >> LocGroup("footer")

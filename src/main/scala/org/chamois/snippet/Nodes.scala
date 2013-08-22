@@ -11,7 +11,7 @@ import net.liftweb.squerylrecord.RecordTypeMode._
 
 object Nodes {
   
-  def children(node:Node, nodes:Iterable[Node]) =
+  def children(node:Node) =
     nodes filter (_.parentId.get match {
       case Some(parentId) if parentId == node.id => true
       case _ => false
@@ -27,15 +27,15 @@ object Nodes {
     })
   }
   
-  def treeNodes(allNodes:Iterable[Node], nodes:Iterable[Node], reqPath:List[String], path:List[String] = Nil): NodeSeq =
+  def treeNodes(nodes:Iterable[Node], reqPath:List[String], path:List[String] = Nil): NodeSeq =
     if (nodes.isEmpty) Nil else {
       val collapsed = path.isEmpty || reqPath.startsWith(path)
       <ul class={List("tree", if (collapsed) "" else "collapse").mkString(" ")} id={"tree-" + path.mkString("-")}>
-        {nodes.map(treeNode(allNodes, _, reqPath, path))}
+        {nodes.map(treeNode(_, reqPath, path))}
       </ul>
     }
   
-  def treeNode(allNodes:Iterable[Node], node:Node, reqPath:List[String], parentPath:List[String]): NodeSeq = {
+  def treeNode(node:Node, reqPath:List[String], parentPath:List[String]): NodeSeq = {
     val path = parentPath ::: node.slug.get :: Nil
     val current = path == reqPath
     <li>
@@ -52,18 +52,29 @@ object Nodes {
           }
         }
       </div>
-      {treeNodes(allNodes, children(node, nodes), reqPath, path)}
+      {treeNodes(node.children, reqPath, path)}
     </li>
   }
   
-  def allNodes = from(nodes)(n => select(n))
-  
   def tree(node:Node)(n:NodeSeq): NodeSeq = {
-    treeNodes(allNodes, allNodes filter (_.parentId.get.isEmpty), node.path)
+    treeNodes(Node.rootNodes, node.path)
   }
   
   def tree(n:NodeSeq): NodeSeq = {
-    treeNodes(allNodes, allNodes filter (_.parentId.get.isEmpty), Nil)
+    treeNodes(Node.rootNodes, Nil)
+  }
+  
+  
+  def breadcrumb(node:Node)(n:NodeSeq) = {
+    def steps(p:List[String], parentPath:String = "/document"): NodeSeq = p match {
+      case head :: Nil => <li class="active">{head}</li>
+      case head :: tail => {
+        val path = parentPath + "/" + head
+        <li><a href={path}>{head}</a></li> ++ {steps(tail, path)}
+      }
+      case Nil => Nil
+    }
+    <ul class="breadcrumb">{steps(node.path)}</ul>
   }
   
 }

@@ -5,6 +5,8 @@
 // client-side compilation
 @import "/vendor/bootstrap/less/bootstrap.less";
 
+@import "tree.less";
+
 body {
   padding-top: 60px;
 }
@@ -13,25 +15,29 @@ body {
   margin: 40px 0;
 }
 
-
+/*
 ul.tree {
   list-style-type: none;
   padding-left: 0;
+  
+  ul.tree {
+    list-style-type: none;
+    padding-left: 20px;
+  }
+  
+  .collapse-trigger {
+    cursor: pointer;
+  }
+
+  .current {
+    font-weight: bold;
+  }
 }
 
-ul.tree ul.tree {
-  list-style-type: none;
-  padding-left: 20px;
+.breadcrumb {
+  span {
+    &:before { content: ' > '; }
+    &:before:first-child { content: ''; }
+  }
 }
-
-ul.tree li {
-}
-
-ul.tree .collapse-trigger {
-  cursor: pointer;
-}
-
-ul.tree .current {
-  font-weight: bold;
-}
-
+*/

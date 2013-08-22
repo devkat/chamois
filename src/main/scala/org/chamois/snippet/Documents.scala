@@ -26,12 +26,7 @@ object Documents {
     }
   
   def xmlContent(version:Version) =
-    try {
-      XML.load(new ByteArrayInputStream(version.content.get)) //\ "body" \ "_"
-    }
-    catch {
-      case _:Throwable => <p>Could not load content.</p>
-    }
+    version.xmlContent \ "body" \ "_"
   
   def content(doc:Document)(n:NodeSeq): NodeSeq = withCurrentVersion(doc) { version =>
     version.mediaType.get.split("/").toList match {
@@ -61,4 +56,6 @@ object Documents {
       }
     </table>
   
+  def editLink(doc:Document)(n:NodeSeq): NodeSeq =
+    <a class="btn btn-default" href={"/mercury/" + doc.node.path.mkString("/")}>{n}</a>
 }
