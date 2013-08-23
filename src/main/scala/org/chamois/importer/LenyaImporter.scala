@@ -15,6 +15,7 @@ import scala.xml.MetaData
 import scala.xml.Attribute
 import scala.xml.Text
 import org.chamois.util.MediaType
+import org.chamois.web.HtmlLinkRewriter
 
 case class Doc(val uuid: String, val lang: String)
   
@@ -144,7 +145,7 @@ object LenyaImporter {
             <title>{doc.name.get}</title>
           </head>
           <body>
-            {LinkRewriter.rewriteLinks(XML.loadFile(contentFile) \ "body" \ "_", lang)}
+            {new LinkRewriter(lang).rewriteLinks(XML.loadFile(contentFile) \ "body" \ "_")}
           </body>
         </html>
         val bytes = content.toString.getBytes("utf-8")
@@ -165,17 +166,17 @@ object LenyaImporter {
   
 }
 
-object LinkRewriter {
+class LinkRewriter(val fromLang:String)(implicit doc2uuid:Map[Doc, UUID]) extends HtmlLinkRewriter {
   
   val lenyaDocPrefix = "lenya-document:"
   val urnPrefix = "urn:uuid:"
   val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
   val langRegex = "lang=([a-z]{2})".r
   
-  def resolve(uuid:String, lang:String)(implicit doc2uuid:Map[Doc, UUID]) =
+  def resolve(uuid:String, lang:String) =
     doc2uuid.getOrElse(Doc(uuid, lang), uuid + ":" + lang + "[unresolved]")
   
-  def rewriteLink(href:String, fromLang:String)(implicit doc2uuid:Map[Doc, UUID]) = href match {
+  def rewriteLink(href:String) = href match {
     case h if h.startsWith(lenyaDocPrefix) => {
       val s = h.substring(lenyaDocPrefix.length())
       uuidRegex findFirstIn s match {
@@ -191,17 +192,5 @@ object LinkRewriter {
     case h => h
   }
   
-  def rewriteLinks(nodes:NodeSeq, lang:String)(implicit doc2uuid:Map[Doc, UUID]) = {
-    val transformer = new RuleTransformer(new RewriteRule {
-      override def transform(n: scala.xml.Node): Seq[scala.xml.Node] = n match {
-        case e:Elem if e.label == "a" && (e \ "@href").text.startsWith(lenyaDocPrefix) => {
-          val newHref = rewriteLink((e \ "@href").text, lang)
-          e.copy(attributes = e.attributes.remove("href").append(Attribute("href", Text(newHref), scala.xml.Null)))
-        }
-        case n => n
-      }
-    })
-    transformer.transform(nodes)
-  }
-  
+  def matches(h:String) = h.startsWith(lenyaDocPrefix)
 }

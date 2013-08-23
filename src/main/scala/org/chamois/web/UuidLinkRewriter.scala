@@ -1,4 +1,4 @@
-package org.chamois.sitemap
+package org.chamois.web
 
 import scala.xml.NodeSeq
 import scala.xml.transform.RuleTransformer
@@ -10,7 +10,7 @@ import scala.xml.Text
 import scala.xml.MetaData
 import scala.xml.Null
 
-class LinkRewriter {
+class UuidLinkRewriter extends HtmlLinkRewriter {
   
   val urnPrefix = "urn:uuid:"
   val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
@@ -20,7 +20,7 @@ class LinkRewriter {
   
   def resolve(uuid:String) = {
     cache.getOrElseUpdate(uuid, Document.findByUuid(uuid) match {
-      case Some(doc) => "/document/" + doc.node.path.mkString("/")
+      case Some(doc) => "/api/document" + doc.node.href
       case None => urnPrefix + uuid + "[unresolved]"
     })
   }
@@ -36,27 +36,7 @@ class LinkRewriter {
     }
     case h => h
   }
-
-  object transformer extends RuleTransformer(new RewriteRule {
-    override def transform(n: scala.xml.Node): Seq[scala.xml.Node] = {
-      n match {
-        case e @ Elem(_, "a", attrs, _, _*) => {
-          attrs.get("href") match {
-            case Some(Text(href)) if href.startsWith(urnPrefix) => {
-              val otherAttrs = attrs.filter(_.key != "href")
-              val newHref = rewriteLink(href)
-              println("rewriting " + href + " to " + newHref)
-              val newAttrs = MetaData.concatenate(otherAttrs, Attribute("href", Text(newHref), Null))
-              e.asInstanceOf[Elem].copy(attributes = newAttrs)
-            }
-            case _ => e
-          }
-        }
-        case n => n
-      }
-    }
-  })
-
-  def rewriteLinks(nodes:NodeSeq) = transformer.transform(nodes)
+  
+  def matches(href:String) = href.startsWith(urnPrefix)
 
 }

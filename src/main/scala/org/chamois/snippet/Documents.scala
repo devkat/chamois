@@ -6,7 +6,7 @@ import org.chamois.model.User
 import net.liftweb.common.Full
 import scala.xml.XML
 import java.io.ByteArrayInputStream
-import org.chamois.sitemap.LinkRewriter
+import org.chamois.web.UuidLinkRewriter
 import org.chamois.util.MediaType
 
 object Documents {
@@ -28,7 +28,7 @@ object Documents {
     }
   
   def xmlContent(version:Version) =
-    new LinkRewriter().rewriteLinks(version.xmlContent \ "body" \ "_")
+    new UuidLinkRewriter().rewriteLinks(version.xmlContent \ "body" \ "_")
     //version.xmlContent \ "body" \ "_"
   
   def content(doc:Document)(n:NodeSeq): NodeSeq = withCurrentVersion(doc) { version =>
