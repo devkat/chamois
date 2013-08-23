@@ -15,6 +15,7 @@ require([
   $(document).ready(function() {
     
     var navtree = $('<ul>').attr('id', 'navtree');
+    /*
     $('#nav-trigger').popover({
       html: true,
       placement: 'bottom',
@@ -22,6 +23,10 @@ require([
     })
     .on('show.bs.popover', function(evt) {
       tree(navtree, { apiUrl: '/api/node', hrefUrl: '/document' });
+    });
+    */
+    $('#nav-dropdown').on('show.bs.dropdown', function(evt) {
+      tree($('.dropdown-menu', evt.target), { apiUrl: '/api/node', hrefUrl: '/document' });
     });
   });
   

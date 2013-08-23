@@ -6,6 +6,8 @@ import org.chamois.model.User
 import net.liftweb.common.Full
 import scala.xml.XML
 import java.io.ByteArrayInputStream
+import org.chamois.sitemap.LinkRewriter
+import org.chamois.util.MediaType
 
 object Documents {
   
@@ -26,12 +28,13 @@ object Documents {
     }
   
   def xmlContent(version:Version) =
-    version.xmlContent \ "body" \ "_"
+    new LinkRewriter().rewriteLinks(version.xmlContent \ "body" \ "_")
+    //version.xmlContent \ "body" \ "_"
   
   def content(doc:Document)(n:NodeSeq): NodeSeq = withCurrentVersion(doc) { version =>
-    version.mediaType.get.split("/").toList match {
-      case "image" :: subtype => <img src=""/>
-      case "application" :: "xhtml+xml" :: Nil => xmlContent(version)
+    version.mediaType match {
+      case MediaType("image", _) => <img src={"/api/document" + doc.node.href}/>
+      case MediaType("application", "xhtml+xml") => xmlContent(version)
       case _ => <p>Cannot display content for this media type.</p>
     }
   }
@@ -43,7 +46,7 @@ object Documents {
     </div>
     <div class="form-group">
       <label for="mediaType">Media type</label>
-      <span class="form-control">{version.mediaType.get}</span>
+      <span class="form-control">{version.mediaType.toString}</span>
     </div>
   }
   

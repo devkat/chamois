@@ -14,6 +14,7 @@ import org.chamois.model._
 import org.apache.tika.io.IOUtils
 import org.apache.tika.Tika
 import net.liftweb.squerylrecord.RecordTypeMode._
+import org.chamois.util.MediaType
 
 object DocumentsRest extends RestHelper { //}RestService[Document]("document") {
   
@@ -26,7 +27,10 @@ object DocumentsRest extends RestHelper { //}RestService[Document]("document") {
     case Node(node) Get _ => node.document match {
       case Some(doc) => doc.currentVersion match {
         case None => NotFoundResponse()
-        case Some(version) => AppXmlResponse(version.xmlContent)
+        case Some(version) => version.mediaType match {
+          case MediaType("application", "xhtml+xml") => AppXmlResponse(version.xmlContent)
+          case t => InMemoryResponse(version.content.get, ("Content-Type", t.toString) :: Nil, Nil, 200)
+        }
       }
       case None => NotFoundResponse()
     }

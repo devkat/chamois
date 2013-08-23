@@ -31,6 +31,10 @@ case class Document private() extends Record[Document] with KeyedRecord[String] 
     Document.fromJValue(json)
     
   def versions = documentToVersions.left(this)
+  
+  def numVersions:Long =
+    from(versions)(v => compute(count))
+    //from(versions)(v => where(v.uuid === uuid) compute(max(v.number))):Option[Int]
 
   def currentVersion =
     Version.findLatestVersion(idField.get)

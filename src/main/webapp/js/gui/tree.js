@@ -28,6 +28,12 @@ define([
           }, node)).trim()),
           triggerElem = $('> .collapse-trigger', elem),
           childrenElem = $('> ul', elem);
+        
+        triggerElem.on('click', function(evt) {
+          childrenElem.collapse('toggle');
+          evt.stopPropagation();
+        });
+
         childrenElem.on('show.bs.collapse', function(evt) {
           evt.stopPropagation();
           triggerElem.removeClass('icon-folder-close').addClass('icon-folder-open');
@@ -53,6 +59,9 @@ define([
         success: function(data) {
           loader.remove();
           _.each(data, renderNode);
+        },
+        error: function(error) {
+          debugger;
         }
       });
     }

@@ -26,7 +26,7 @@ object MercuryRest extends RestHelper {
       Node.findByPath(path).flatMap(_.document) match {
         case Some(doc) => {
           val version = Version.newVersion(doc.uuid.get)
-          version.mediaType.set("application/xhtml+xml")
+          version.mediaTypeString.set("application/xhtml+xml")
           
           val markup = (json \ "content" \ "content" \ "value").extract[String]
           //println("#" * 20 + "\nMarkup: " + markup)

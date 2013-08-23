@@ -15,6 +15,7 @@ import org.squeryl.KeyedEntity
 import org.squeryl.Query
 import scala.xml.NodeSeq
 import java.io.ByteArrayInputStream
+import org.chamois.util.MediaType
 
 case class Version private() extends Record[Version]
     with KeyedEntity[CompositeKey2[StringField[Version], IntField[Version]]] {
@@ -32,7 +33,9 @@ case class Version private() extends Record[Version]
   val content = new BinaryField(this)
   
   @Column(name="media_type")
-  val mediaType = new StringField(this, 256)
+  val mediaTypeString = new StringField(this, 256)
+  
+  def mediaType = MediaType.parse(mediaTypeString.get).get
   
   @Column(name="content_length")
   val contentLength = new LongField(this)
@@ -50,10 +53,10 @@ case class Version private() extends Record[Version]
     </html>
   
   def xmlContent = {
-    this.mediaType.get.split("/").toList match {
-      case "application" :: "xhtml+xml" :: Nil =>
+    this.mediaType match {
+      case MediaType("application", "xhtml+xml") =>
         Html5.parse(new ByteArrayInputStream(content.get)).get
-      case str => htmlPage("Not an HTML page", <p>Not an HTML page</p>)
+      case _ => htmlPage("Not an HTML page", <p>Not an HTML page</p>)
     }
   }
   

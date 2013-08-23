@@ -53,6 +53,7 @@ class Node private() extends Record[Node] with KeyedRecord[Long] {
     case None => slug.get :: Nil
   }
   
+  def href = "/" + path.mkString("/")
 }
 
 object Node extends Node with MetaRecord[Node] {
