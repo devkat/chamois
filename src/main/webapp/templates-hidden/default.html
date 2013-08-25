@@ -16,6 +16,7 @@
     -->
     <link rel="stylesheet/less" type="text/css" href="/less/bootstrap.less" />
     <link rel="stylesheet/less" type="text/css" href="/sobu/less/sobu.less"/>
+    <link href='http://fonts.googleapis.com/css?family=Condiment' rel='stylesheet' type='text/css'>
     <!--
       -->
     <script type="text/javascript" src="/vendor/less.js/dist/less-1.4.0.js"></script>
@@ -27,29 +28,44 @@
     
     <script type="text/javascript" src="/vendor/requirejs/require.js" data-main="chamois"></script>
     
+    <script type="text/x-jsrender" id="tree-node-template">
+      <li>
+        {{if hasChildren}}
+        <span class="collapse-trigger icon {{:closedIcon}}"
+          data-toggle="collapse"
+          data-target="#treenode{{:id}}"></span>
+         {{if current}}<span class="current">{{:slug}}</span>{{else}}<a href="{{:href}}">{{:slug}}</a>{{/if}}
+        <ul class="collapse" id="treenode{{:id}}"></ul>
+        {{else}}
+        <span class="icon {{:fileIcon}}"></span>
+        {{if current}}<span class="current">{{:slug}}</span>{{else}}<a href="{{:href}}">{{:slug}}</a>{{/if}}
+        {{/if}}
+      </li>
+    </script>
   </head>
   <body>
-  
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/">Chamois</a>
-        <div class="nav-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="/">Home</a></li>
-          </ul>
-          <!--
-          <ul class="nav navbar-nav pull-right">
-            <li><a href="/examples/navbar/">Default</a></li>
-            <li><a href="/examples/navbar-static-top/">Static top</a></li>
-            <li class="active"><a href="/examples/navbar-fixed-top/">Fixed top</a></li>
-          </ul>
-            -->
-        </div><!--/.nav-collapse -->
+    <div class="arriba">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Arriba</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="active"><a href="/">Home</a></li>
+            </ul>
+            <!--
+            <ul class="nav navbar-nav pull-right">
+              <li><a href="/examples/navbar/">Default</a></li>
+              <li><a href="/examples/navbar-static-top/">Static top</a></li>
+              <li class="active"><a href="/examples/navbar-fixed-top/">Fixed top</a></li>
+            </ul>
+              -->
+          </div><!--/.nav-collapse -->
+        </div>
       </div>
     </div>
     <div id="content"></div>

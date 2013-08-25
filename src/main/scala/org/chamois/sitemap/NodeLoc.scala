@@ -59,7 +59,7 @@ object NodeLoc extends Loc[NodeInfo] {
   
   override def calcHref(info:NodeInfo) =
     info match {
-      case FullNodeInfo(node) => "/node/" + urlEncode(node.path.join("/"))
+      case FullNodeInfo(node) => "/node" + node.href
     }
   
   override def name = "node"

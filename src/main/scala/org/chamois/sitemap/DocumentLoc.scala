@@ -45,11 +45,11 @@ class DocumentLocBase(val prefix:String) extends Loc[NodeInfo] {
   
   override def snippets = {
   case ("breadcrumb", Full(FullNodeInfo(node))) => Nodes.breadcrumb(node) _
-  case ("tree", Full(FullNodeInfo(node))) => Nodes.tree(node)
   case ("content", Full(FullNodeInfo(node))) => withDoc(node, Documents.content _)
   case ("meta", Full(FullNodeInfo(node))) => withDoc(node, Documents.meta _)
   case ("versions", Full(FullNodeInfo(node))) => withDoc(node, Documents.versions _)
   case ("editLink", Full(FullNodeInfo(node))) => withDoc(node, Documents.editLink _)
+  case ("createLink", Full(FullNodeInfo(node))) => withDoc(node, Documents.createLink _)
   }
   
   override def params = Nil
@@ -68,7 +68,7 @@ class DocumentLocBase(val prefix:String) extends Loc[NodeInfo] {
   
   override def calcHref(info:NodeInfo) =
     info match {
-      case FullNodeInfo(node) => (prefix ++ node.path).mkString("/")
+      case FullNodeInfo(node) => (prefix ++ node.path.slugs).mkString("/")
     }
   
   override def name = prefix

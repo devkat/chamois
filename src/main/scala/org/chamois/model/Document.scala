@@ -22,7 +22,10 @@ case class Document private() extends Record[Document] with KeyedRecord[String] 
   
   def uuid = idField
     
-  val name = new StringField(this, 256)
+  val name = new StringField(this, 256) {
+    override def validations =
+      valMinLen(1, "Name must not be empty.") _ :: super.validations
+  }
   
   def unapply(uuid:String): Option[Document] =
     Document.findByUuid(uuid)
@@ -42,6 +45,12 @@ case class Document private() extends Record[Document] with KeyedRecord[String] 
   def delete_! = documents.delete(this.id)
   
   def node = from(nodes)(n => where(n.documentUuid === Some(uuid.get)).select(n)).headOption.get
+  
+  def newVersion() = {
+    val version = Version.newVersion(uuid.get)
+    ChamoisDb.versions.insert(version)
+    version
+  }
   
 }
 

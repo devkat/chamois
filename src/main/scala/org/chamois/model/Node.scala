@@ -9,6 +9,7 @@ import net.liftweb.record.MetaRecord
 import net.liftweb.squerylrecord.RecordTypeMode._
 import ChamoisDb._
 import net.liftweb.common.Full
+import org.chamois.util.Path
 
 class Node private() extends Record[Node] with KeyedRecord[Long] {
 
@@ -17,7 +18,11 @@ class Node private() extends Record[Node] with KeyedRecord[Long] {
   @Column(name="id")
   override val idField = new LongField(this)
     
-  val slug = new StringField(this, 256)
+  val slug = new StringField(this, 256) {
+    override def validations =
+      valMinLen(1, "Slug must not be empty.") _ :: super.validations
+  }
+  
   val created = new DateTimeField(this)
   val position = new IntField(this)
   
@@ -48,12 +53,12 @@ class Node private() extends Record[Node] with KeyedRecord[Long] {
   
   def children = nodeToChildren.left(this)
   
-  def path:List[String] = parent match {
-    case Some(p) => p.path ::: slug.get :: Nil
+  def path:Path = parent match {
+    case Some(p) => p.path.slugs ::: slug.get :: Nil
     case None => slug.get :: Nil
   }
   
-  def href = "/" + path.mkString("/")
+  def href = path.toString
 }
 
 object Node extends Node with MetaRecord[Node] {
@@ -69,8 +74,8 @@ object Node extends Node with MetaRecord[Node] {
       case None => from(nodes)(n => where(n.slug === slug and (n.parentId isNull)) select(n)).headOption
     }
   
-  def findByPath(path:List[String], parent:Option[Node] = None): Option[Node] =
-    path match {
+  def findByPath(path:Path, parent:Option[Node] = None): Option[Node] =
+    path.slugs match {
       case slug :: childPath => {
         val node = findBySlug(slug, parent)
         node match {

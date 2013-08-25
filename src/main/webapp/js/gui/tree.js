@@ -7,7 +7,11 @@ define([
   _
 ) {
   
-  var nodeTemplate = $('#tree-node-template');
+  var
+    nodeTemplate = $('#tree-node-template'),
+    openIcon = 'icon-minus-sign-alt',
+    closedIcon = 'icon-plus-sign-alt',
+    fileIcon = 'icon-sign-blank';
   
   return function(parent, settings) {
     
@@ -24,7 +28,9 @@ define([
           elem = $(nodeTemplate.render(_.extend({
             id: _.uniqueId(),
             href: hrefUrl + nodePath,
-            current: currentPath === nodePath
+            current: currentPath === nodePath,
+            closedIcon: closedIcon,
+            fileIcon: fileIcon
           }, node)).trim()),
           triggerElem = $('> .collapse-trigger', elem),
           childrenElem = $('> ul', elem);
@@ -36,14 +42,14 @@ define([
 
         childrenElem.on('show.bs.collapse', function(evt) {
           evt.stopPropagation();
-          triggerElem.removeClass('icon-folder-close').addClass('icon-folder-open');
+          triggerElem.removeClass(closedIcon).addClass(openIcon);
           if ($('> *', childrenElem).length === 0) {
             loadChildren(childrenElem, nodePath);
           }
         });
         childrenElem.on('hide.bs.collapse', function(evt) {
           evt.stopPropagation();
-          triggerElem.removeClass('icon-folder-open').addClass('icon-folder-close');
+          triggerElem.removeClass(openIcon).addClass(closedIcon);
         });
         if (currentPath.match(new RegExp('^' + nodePath))) {
           childrenElem.collapse({toggle: true});

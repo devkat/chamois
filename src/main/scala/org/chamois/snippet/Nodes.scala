@@ -8,6 +8,7 @@ import org.chamois.model.Node
 import org.chamois.model.ChamoisDb._
 import net.liftweb.http.S
 import net.liftweb.squerylrecord.RecordTypeMode._
+import org.chamois.util.Path
 
 object Nodes {
   
@@ -27,46 +28,8 @@ object Nodes {
     })
   }
   
-  def treeNodes(nodes:Iterable[Node], reqPath:List[String], path:List[String] = Nil): NodeSeq =
-    if (nodes.isEmpty) Nil else {
-      val collapsed = path.isEmpty || reqPath.startsWith(path)
-      <ul class={List("tree", if (collapsed) "" else "collapse").mkString(" ")} id={"tree-" + path.mkString("-")}>
-        {nodes.map(treeNode(_, reqPath, path))}
-      </ul>
-    }
-  
-  def treeNode(node:Node, reqPath:List[String], parentPath:List[String]): NodeSeq = {
-    val path = parentPath ::: node.slug.get :: Nil
-    val current = path == reqPath
-    <li>
-      <div class="tree-node">
-        <span
-          class={"glyphicon glyphicon-" + (if (node.children.isEmpty) "file" else "folder-close")}
-          data-toggle="collapse" data-target={"#tree-" + path.mkString("-")}></span>
-        {
-          if (current) {
-            <span>{node.slug}</span>
-          }
-          else {
-            <a href={("/document" :: path).mkString("/")}>{node.slug}</a>
-          }
-        }
-      </div>
-      {treeNodes(node.children, reqPath, path)}
-    </li>
-  }
-  
-  def tree(node:Node)(n:NodeSeq): NodeSeq = {
-    treeNodes(Node.rootNodes, node.path)
-  }
-  
-  def tree(n:NodeSeq): NodeSeq = {
-    treeNodes(Node.rootNodes, Nil)
-  }
-  
-  
   def breadcrumb(node:Node)(n:NodeSeq) = {
-    def steps(p:List[String], parentPath:String = "/document"): NodeSeq = p match {
+    def steps(p:Path, parentPath:String = "/document"): NodeSeq = p.slugs match {
       case head :: Nil => <li class="active">{head}</li>
       case head :: tail => {
         val path = parentPath + "/" + head
@@ -74,7 +37,19 @@ object Nodes {
       }
       case Nil => Nil
     }
-    <ul class="breadcrumb">{steps(node.path)}</ul>
+    <ul class="breadcrumb">{n \ "_"}{steps(node.path)}</ul>
   }
   
+  /*
+  def navButton(n:NodeSeq) =
+    <li class="dropdown" id="nav-dropdown">
+      <button class="btn btn-default" data-toggle="dropdown"><span class="icon icon-sitemap"/> <span class="caret"/></button>
+      <ul class="dropdown-menu"></ul>
+    </li>
+  */
+  
+  def navButton(n:NodeSeq) =
+      <button class="btn btn-nav dropdown" data-toggle="dropdown"><span class="icon icon-sitemap"/> <span class="caret"/></button>
+      <ul class="dropdown-menu"></ul>
+
 }

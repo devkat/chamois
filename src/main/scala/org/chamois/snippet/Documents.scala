@@ -60,5 +60,8 @@ object Documents {
     </table>
   
   def editLink(doc:Document)(n:NodeSeq): NodeSeq =
-    <a class="btn btn-default" href={"/mercury/" + doc.node.path.mkString("/")}>{n}</a>
+    <a class="btn btn-default" href={"/mercury" + doc.node.href}>{n}</a>
+    
+  def createLink(doc:Document)(n:NodeSeq): NodeSeq =
+    <a class="btn btn-default" href={"/create-document?parent=" + doc.node.href}>{n}</a>
 }
