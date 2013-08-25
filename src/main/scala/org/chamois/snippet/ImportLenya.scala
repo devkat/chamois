@@ -20,7 +20,7 @@ class ImportLenya extends BootstrapScreen {
   
   def finish() {
     
-    List(nodes, versions, documents) foreach {_.deleteWhere(r => 1 === 1)}
+    List(versions, resources) foreach {_.deleteWhere(r => 1 === 1)}
     
     val file = new File(path.get)
     if (file.isDirectory()) {

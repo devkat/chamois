@@ -4,11 +4,12 @@ import scala.xml.NodeSeq
 import scala.xml.transform.RuleTransformer
 import scala.xml.Elem
 import scala.xml.transform.RewriteRule
-import org.chamois.model.Document
+import org.chamois.model.Resource
 import scala.xml.Attribute
 import scala.xml.Text
 import scala.xml.MetaData
 import scala.xml.Null
+import java.util.UUID
 
 class UuidLinkRewriter extends HtmlLinkRewriter {
   
@@ -16,11 +17,11 @@ class UuidLinkRewriter extends HtmlLinkRewriter {
   val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
   val langRegex = "lang=([a-z]{2})".r
   
-  val cache = scala.collection.mutable.Map.empty[String, String]
+  val cache = scala.collection.mutable.Map.empty[UUID, String]
   
-  def resolve(uuid:String) = {
-    cache.getOrElseUpdate(uuid, Document.findByUuid(uuid) match {
-      case Some(doc) => "/api/document" + doc.node.href
+  def resolve(uuid:UUID) = {
+    cache.getOrElseUpdate(uuid, Resource.findByUuid(uuid) match {
+      case Some(res) => "/api/document" + res.href
       case None => urnPrefix + uuid + "[unresolved]"
     })
   }
@@ -30,7 +31,7 @@ class UuidLinkRewriter extends HtmlLinkRewriter {
     case h if h.startsWith(urnPrefix) => {
       val s = h.substring(urnPrefix.length())
       uuidRegex findFirstIn s match {
-        case Some(uuid) => resolve(uuid)
+        case Some(uuid) => resolve(UUID.fromString(uuid))
         case None => h + "[invalid]"
       }
     }

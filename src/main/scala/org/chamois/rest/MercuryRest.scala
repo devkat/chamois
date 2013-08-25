@@ -3,7 +3,7 @@ import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
 import net.liftweb.json.JString
 import net.liftweb.json.JArray
-import org.chamois.model.Document
+import org.chamois.model.Resource
 import net.liftweb.json.JValue
 import net.liftweb.json.JBool
 import net.liftweb.common._
@@ -18,21 +18,21 @@ object MercuryRest extends RestHelper {
   
   import ChamoisDb._
   
-  serve( "api" / "mercury" prefix {
+  serve( "rest" / "mercury" prefix {
     
     // post document as JSON
     case path JsonPut json -> _ => {
       
-      Node.findByPath(path).flatMap(_.document) match {
-        case Some(doc) => {
-          val version = Version.newVersion(doc.uuid.get)
+      Resource.findByPath(path) match {
+        case Some(resource) => {
+          val version = Version.newVersion(resource.id)
           version.mediaTypeString.set("application/xhtml+xml")
           
           val markup = (json \ "content" \ "content" \ "value").extract[String]
           //println("#" * 20 + "\nMarkup: " + markup)
           val html = Html5.parse(markup).get
           val page = <html>
-            <head><title>{doc.name.get}</title></head>
+            <head><title>{resource.uuid.get}</title></head>
             <body>{html}</body>
           </html>
           

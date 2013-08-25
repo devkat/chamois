@@ -3,8 +3,7 @@ package org.chamois.snippet
 import net.liftweb.squerylrecord.RecordTypeMode._
 import net.liftweb.http.S
 import org.chamois.model.ChamoisDb._
-import org.chamois.model.Document
-import org.chamois.model.Node
+import org.chamois.model.Resource
 import org.chamois.model.Version
 import java.util.UUID
 import scala.xml.Text
@@ -13,13 +12,12 @@ import org.chamois.util.Path
 import net.liftweb.http.SHtml
 import scala.xml.NodeSeq
 
-object CreateDocument extends BootstrapScreen {
+object CreateResource extends BootstrapScreen {
 
-  override def screenTop = <span>Create document</span>
+  override def screenTop = <span>Create resource</span>
     
   object parentPath extends ScreenVar[Box[String]](Empty)
-  object doc extends ScreenVar(Document.createRecord)
-  object node extends ScreenVar(Node.createRecord)
+  object resource extends ScreenVar(Resource.createRecord)
   
   /*
   val textField = new Field { 
@@ -39,8 +37,7 @@ object CreateDocument extends BootstrapScreen {
       f => Some(<span class="form-control">{f.get}</span>),
       NothingOtherValueInitializer)
   
-  addFields(() => node.slug)
-  addFields(() => doc.name)
+  addFields(() => resource.slug)
 
   override def localSetup() {
     super.localSetup()
@@ -49,31 +46,24 @@ object CreateDocument extends BootstrapScreen {
   
   def finish() {
     
-    def createDoc() = {
-      doc.uuid.set(UUID.randomUUID.toString)
-      documents.insert(doc)
-      doc.newVersion()
-      doc
+    def createResource(parent:Option[Resource] = None) {
+      resource.uuid.set(UUID.randomUUID)
+      resource.parentId.set(parent map (_.id))
+      resources.insert(resource)
+      resource.newVersion()
     }
     
-    def createDocAndNode(parent:Option[Node] = None) = {
-      createDoc()
-      node.documentUuid.set(Some(doc.uuid.get))
-      node.parentId.set(parent map (_.id))
-      nodes.insert(node)
-    }
-
     parentPath.get match {
       case Full(p) => {
         p match {
-          case Path.root => createDocAndNode()
-          case path => Node.findByPath(path) match {
-            case None => S.notice("Parent node " + path + " not found.")
-            case node => createDocAndNode(node)
+          case Path.root => createResource()
+          case path => Resource.findByPath(path) match {
+            case None => S.notice("Parent resource " + path + " not found.")
+            case node => createResource(node)
           }
         }
       }
-      case Empty => createDoc()
+      case Empty => createResource()
       case Failure(msg, _, _) => S.notice("Failure: " + msg)
     }
 

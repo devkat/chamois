@@ -40,17 +40,26 @@
       </column>
     </createTable>
     
-    <createTable tableName="document">
-      <column name="uuid" type="char(36)">
+    <createTable tableName="resource">
+      <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="name" type="varchar(256)">
+      <column name="uuid" type="uuid">
+        <constraints unique="true" nullable="false"/>
+      </column>
+      <column name="slug" type="varchar(256)">
         <constraints nullable="false"/>
       </column>
+      <column name="parent_id" type="bigint"/>
     </createTable>
+    <addForeignKeyConstraint constraintName="resource__parent_id"
+      baseTableName="resource" baseColumnNames="parent_id"
+      referencedTableName="resource" referencedColumnNames="id"/>
+    <addUniqueConstraint constraintName="unique_resource__parent_id__slug"
+      tableName="resource" columnNames="parent_id, slug"/>
  
     <createTable tableName="version">
-      <column name="uuid" type="char(36)">
+      <column name="resource_id" type="bigint">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="number" type="int">
@@ -69,36 +78,13 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addUniqueConstraint tableName="version" columnNames="uuid, number"/>
-    <addForeignKeyConstraint constraintName="version__uuid"
-      baseTableName="version" baseColumnNames="uuid"
-      referencedTableName="document" referencedColumnNames="uuid"/>
+    <addUniqueConstraint tableName="version" columnNames="resource_id, number"/>
+    <addForeignKeyConstraint constraintName="version__resource_id"
+      baseTableName="version" baseColumnNames="resource_id"
+      referencedTableName="resource" referencedColumnNames="id"/>
  
-    <createTable tableName="node">
-      <column name="id" type="bigint" autoIncrement="true">
-        <constraints primaryKey="true" nullable="false"/>
-      </column>
-      <column name="slug" type="varchar(256)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="parent_id" type="bigint"/>
-      <column name="document_uuid" type="char(36)"/>
-      <column name="position" type="int">
-        <constraints nullable="false"/>
-      </column>
-      <column name="created" type="${type.timestamp}">
-        <constraints nullable="false"/>
-      </column>
-    </createTable>
-    <addForeignKeyConstraint constraintName="node__parent_id"
-      baseTableName="node" baseColumnNames="parent_id"
-      referencedTableName="node" referencedColumnNames="id"/>
-    <addForeignKeyConstraint constraintName="node__document_uuid"
-      baseTableName="node" baseColumnNames="document_uuid"
-      referencedTableName="document" referencedColumnNames="uuid"/>
-
     <createTable tableName="version_to_tag">
-      <column name="uuid" type="char(36)">
+      <column name="resource_id" type="bigint">
         <constraints primaryKey="true" nullable="false"/>
       </column>
       <column name="number" type="int">
@@ -107,8 +93,8 @@
       <column name="tag" type="text"/>
     </createTable>
     <addForeignKeyConstraint constraintName="version_to_tag__pk"
-      baseTableName="version_to_tag" baseColumnNames="uuid, number"
-      referencedTableName="version" referencedColumnNames="uuid, number"/>
+      baseTableName="version_to_tag" baseColumnNames="resource_id, number"
+      referencedTableName="version" referencedColumnNames="resource_id, number"/>
 
   </changeSet>
 

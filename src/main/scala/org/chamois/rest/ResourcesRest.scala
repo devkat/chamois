@@ -1,11 +1,7 @@
 package org.chamois.rest
 import net.liftweb.http._
 import net.liftweb.http.rest.RestHelper
-import net.liftweb.json.JString
-import net.liftweb.json.JArray
-import org.chamois.model.Document
-import net.liftweb.json.JValue
-import net.liftweb.json.JBool
+import net.liftweb.json._
 import net.liftweb.common._
 import scala.xml.NodeSeq
 import net.liftweb.util.Html5
@@ -15,24 +11,31 @@ import org.apache.tika.io.IOUtils
 import org.apache.tika.Tika
 import net.liftweb.squerylrecord.RecordTypeMode._
 import org.chamois.util.MediaType
+import net.liftweb.json.JsonAST._
+import net.liftweb.json.JsonDSL._
 
-object DocumentsRest extends RestHelper { //}RestService[Document]("document") {
+object ResourcesRest extends RestHelper { //}RestService[Document]("document") {
   
   import ChamoisDb._
   
   lazy val tika = new Tika();
 
-  serve( "api" / "document" prefix {
+  implicit def toJson(resource:Resource) =
+    ("slug" -> resource.slug.get) ~
+    ("hasChildren" -> resource.hasChildren)
+  
+  serve( "rest" / "resource" prefix {
     
-    case Node(node) Get _ => node.document match {
-      case Some(doc) => doc.currentVersion match {
-        case None => NotFoundResponse()
-        case Some(version) => version.mediaType match {
-          case MediaType("application", "xhtml+xml") => AppXmlResponse(version.xmlContent)
-          case t => InMemoryResponse(version.content.get, ("Content-Type", t.toString) :: Nil, Nil, 200)
-        }
-      }
+    case Nil JsonGet _ => Resource.rootResources.toList: JArray
+    
+    case Resource(r) JsonGet _ => r.children: JArray
+    
+    case Resource(r) Get _ => r.currentVersion match {
       case None => NotFoundResponse()
+      case Some(version) => version.mediaType match {
+        case MediaType("application", "xhtml+xml") => AppXmlResponse(version.xmlContent)
+        case t => InMemoryResponse(version.content.get, ("Content-Type", t.toString) :: Nil, Nil, 200)
+      }
     }
   })
   /*

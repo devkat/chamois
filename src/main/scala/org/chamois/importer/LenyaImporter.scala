@@ -17,7 +17,7 @@ import scala.xml.Text
 import org.chamois.util.MediaType
 import org.chamois.web.HtmlLinkRewriter
 
-case class Doc(val uuid: String, val lang: String)
+case class Doc(val uuid: UUID, val lang: String)
   
 object LenyaImporter {
   
@@ -49,44 +49,58 @@ object LenyaImporter {
       //docs map { doc => (doc -> UUID.randomUUID()) }
     
     List("en", "de", "fr", "it") foreach {lang =>
-      val node = Node.createRecord
-      node.slug.set(lang)
-      nodes.insert(node)
-      (site \ "node") foreach (importNode(area, lang, Some(node)))
+      val res = Resource.createRecord
+      res.slug.set(lang)
+      resources.insert(res)
+      (site \ "node") foreach (importNode(area, lang, Some(res)))
     }
   }
   
   def getDocs(area:File)(xmlNode:scala.xml.Node): Set[Doc] = {
-    val uuid = (xmlNode \ "@uuid").text
-    val docs = (xmlNode \ "label").toSet.map { l:scala.xml.Node =>
-      Doc(uuid, (l \ "@{http://www.w3.org/XML/1998/namespace}lang").text)
+    val docs = (xmlNode \ "@uuid") match {
+      case NodeSeq.Empty => Set.empty[Doc]
+      case n => {
+        val uuid = UUID.fromString(n.text)
+        (xmlNode \ "label").toSet.map { l:scala.xml.Node =>
+          Doc(uuid, (l \ "@{http://www.w3.org/XML/1998/namespace}lang").text)
+        }
+      }
     }
     
     val children = (xmlNode \ "node").toSet.flatMap(getDocs(area) _)
     docs ++ children
   }
   
-  def importNode(area:File, lang:String, parent:Option[Node] = None)(xmlNode:scala.xml.Node)(implicit doc2uuid:Map[Doc, UUID]) {
-      val node = Node.createRecord
-      val slug = (xmlNode \ "@id").text
-      println("Importing node %s".format(slug))
-      
-      parent foreach {p => node.parentId.set(Some(p.id))}
-      node.slug.set(slug)
-      nodes.insert(node)
+  def matchesLang(label:scala.xml.Node, lang:String) =
+    (label \ "@{http://www.w3.org/XML/1998/namespace}lang").text == lang
+  
+  def importNode(area:File, lang:String, parent:Option[Resource] = None)(xmlNode:scala.xml.Node)(implicit doc2uuid:Map[Doc, UUID]) {
+    val slug = (xmlNode \ "@id").text
+    println("Importing node %s".format(slug))
+    
+    val descendants = (xmlNode \\ "label").find(matchesLang(_, lang))
+    
+    if (descendants.isDefined) {
+      val uuid = UUID.fromString((xmlNode \ "@uuid").text)
+      val newUuid = doc2uuid(Doc(uuid, lang))
+      val res = Resource.createRecord
+      res.uuid.set(newUuid)
+      res.slug.set(slug)
+      parent foreach {p => res.parentId.set(Some(p.id))}
+      resources.insert(res)
+
       (xmlNode \ "label") foreach { label =>
         if ((label \ "@{http://www.w3.org/XML/1998/namespace}lang").text == lang) {
-          val docOption = importDoc(area, (xmlNode \ "@uuid").text, lang)
-          docOption foreach (d => node.documentUuid.set(Some(d.uuid.get)))
-          nodes.update(node)
+          importDoc(res, area, uuid, lang)
         }
       }
-      (xmlNode \ "node") foreach importNode(area, lang, Some(node)) _
+      (xmlNode \ "node") foreach importNode(area, lang, Some(res)) _
+    }
   }
   
-  def importDoc(area:File, uuid:String, lang:String)(implicit doc2uuid:Map[Doc, UUID]): Option[Document] = {
-    println("  Importing document %s [%s]".format(uuid, lang))
-    val docFolder = new File(area, uuid)
+  def importDoc(res:Resource, area:File, uuid:UUID, lang:String)(implicit doc2uuid:Map[Doc, UUID]): Option[Resource] = {
+    println("  Importing resource %s [%s]".format(uuid, lang))
+    val docFolder = new File(area, uuid.toString)
     val backupVersions = docFolder.listFiles(new FilenameFilter() {
       override def accept(f:File, name:String) =
         name.matches("""^""" + lang + """\.\d+\.bak$""")
@@ -95,21 +109,17 @@ object LenyaImporter {
     val docVersions = backupVersions.toList ::: new File(docFolder, lang) :: Nil
     
     if (docVersions.length > 0) {
-      val newUuid = doc2uuid(Doc(uuid, lang)).toString
-      val doc = Document.createRecord
-      doc.uuid.set(newUuid)
-      documents.insert(doc)
       docVersions sortBy(_.getName) foreach { v =>
-        importVersion(doc, docFolder, newUuid, lang, v.getName)
+        importVersion(res, docFolder, lang, v.getName)
       }
-      Some(doc)
+      Some(res)
     }
     else {
       None
     }
   }
   
-  def importVersion(doc:Document, docFolder:File, uuid:String, lang:String, fileName:String)(implicit doc2uuid:Map[Doc, UUID]) = {
+  def importVersion(doc:Resource, docFolder:File, lang:String, fileName:String)(implicit doc2uuid:Map[Doc, UUID]) = {
     val contentFile = new File(docFolder, fileName)
     val metaFile = new File(docFolder, lang + ".meta")//fileName.replaceAll("""^""" + lang, lang + ".meta"))
     
@@ -121,17 +131,13 @@ object LenyaImporter {
       val key = (e \ "@key").text
       val value = (e \ "value").text
       if (key == "mimeType") mediaType = value
-      if (key == "title" && fileName == lang) {
-        doc.name.set(value)
-        documents.update(doc)
-      }
     }
     
     println("      Reading content file " + contentFile.getAbsolutePath + ", media type " + mediaType)
     //val content = Source.fromFile(contentFile).map(_.toByte).toArray
     
     def newVersion(init: Version => Unit) {
-      val version = Version.newVersion(uuid)
+      val version = Version.newVersion(doc.id)
       version.mediaTypeString.set(mediaType)
       println("    Importing version %d (%s)".format(version.number.get, fileName))
       init(version)
@@ -142,7 +148,7 @@ object LenyaImporter {
       case Some(MediaType("application", "xhtml+xml")) => newVersion { v =>
         val content = <html lang={lang}>
           <head>
-            <title>{doc.name.get}</title>
+            <title>{doc.uuid.get}</title>
           </head>
           <body>
             {new LinkRewriter(lang).rewriteLinks(XML.loadFile(contentFile) \ "body" \ "_")}
@@ -173,7 +179,7 @@ class LinkRewriter(val fromLang:String)(implicit doc2uuid:Map[Doc, UUID]) extend
   val uuidRegex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".r
   val langRegex = "lang=([a-z]{2})".r
   
-  def resolve(uuid:String, lang:String) =
+  def resolve(uuid:UUID, lang:String) =
     doc2uuid.getOrElse(Doc(uuid, lang), uuid + ":" + lang + "[unresolved]")
   
   def rewriteLink(href:String) = href match {
@@ -182,8 +188,8 @@ class LinkRewriter(val fromLang:String)(implicit doc2uuid:Map[Doc, UUID]) extend
       uuidRegex findFirstIn s match {
         case Some(uuid) => {
           urnPrefix + (langRegex findFirstMatchIn s match {
-            case Some(matcher) => resolve(uuid, matcher.group(1))
-            case None => resolve(uuid, fromLang)
+            case Some(matcher) => resolve(UUID.fromString(uuid), matcher.group(1))
+            case None => resolve(UUID.fromString(uuid), fromLang)
           })
         }
         case None => h + "[invalid]"

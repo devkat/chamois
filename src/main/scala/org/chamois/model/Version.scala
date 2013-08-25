@@ -6,7 +6,7 @@ import net.liftweb.record.Record
 import net.liftweb.squerylrecord.KeyedRecord
 import net.liftweb.record.field._
 import net.liftweb.record.MetaRecord
-import net.liftweb.squerylrecord.RecordTypeMode._
+import net.liftweb.squerylrecord.UuidRecordTypeMode._
 import ChamoisDb._
 import net.liftweb.util.Html5
 import net.liftweb.common._
@@ -16,18 +16,19 @@ import org.squeryl.Query
 import scala.xml.NodeSeq
 import java.io.ByteArrayInputStream
 import org.chamois.util.MediaType
+import java.util.UUID
 
 case class Version private() extends Record[Version]
-    with KeyedEntity[CompositeKey2[StringField[Version], IntField[Version]]] {
+    with KeyedEntity[CompositeKey2[LongField[Version], IntField[Version]]] {
 
   override def meta = Version
   
-  @Column(name="uuid")
-  val uuid = new StringField(this, 36)
+  @Column(name="resource_id")
+  val resourceId = new LongField(this)
   
   val number = new IntField(this)
   
-  def id = compositeKey(uuid, number)
+  def id = compositeKey(resourceId, number)
     
   val created = new DateTimeField(this)
   val content = new BinaryField(this)
@@ -40,7 +41,7 @@ case class Version private() extends Record[Version]
   @Column(name="content_length")
   val contentLength = new LongField(this)
   
-  def document = documentToVersions.right(this).headOption.get
+  def resource = resourceToVersions.right(this).headOption.get
   
   def htmlPage(title:String, content:NodeSeq) =
     <html>
@@ -64,13 +65,13 @@ case class Version private() extends Record[Version]
 
 object Version extends Version with MetaRecord[Version] {
   
-  def findLatestVersion(uuid:String): Option[Version] =
-    from(versions)(v => where(v.uuid === uuid) select(v) orderBy(v.number).desc).page(0, 1).headOption
+  def findLatestVersion(resourceId:Long): Option[Version] =
+    from(versions)(v => where(v.resourceId === resourceId) select(v) orderBy(v.number).desc).page(0, 1).headOption
     
-  def newVersion(uuid:String): Version = {
+  def newVersion(resourceId:Long): Version = {
     val version = Version.createRecord
-    version.uuid.set(uuid)
-    val num = from(versions)(v => where(v.uuid === uuid) compute(max(v.number))):Option[Int]
+    version.resourceId.set(resourceId)
+    val num = from(versions)(v => where(v.resourceId === resourceId) compute(max(v.number))):Option[Int]
     version.number.set(num match {
       case Some(n) => n + 1
       case None => 0
