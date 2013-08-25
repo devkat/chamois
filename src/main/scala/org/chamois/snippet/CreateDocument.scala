@@ -33,7 +33,11 @@ object CreateDocument extends BootstrapScreen {
   val parentPathField = textField("Parent path", parentPath)
   */
   
-  val parentPathField = makeField[String, Nothing]("Parent path", parentPath.get.openOr("(none)"), f => Some(Text(f.get)), NothingOtherValueInitializer)
+  val parentPathField = makeField[String, Nothing](
+      "Parent path",
+      parentPath.get.openOr("(none)"),
+      f => Some(<span class="form-control">{f.get}</span>),
+      NothingOtherValueInitializer)
   
   addFields(() => node.slug)
   addFields(() => doc.name)
