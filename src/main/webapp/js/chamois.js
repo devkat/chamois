@@ -26,7 +26,7 @@ require([
     });
     */
     $('#nav-dropdown').on('show.bs.dropdown', function(evt) {
-      tree($('.dropdown-menu', evt.target), { apiUrl: '/rest/resource', hrefUrl: '/document' });
+      tree($('.dropdown-menu', evt.target), { apiUrl: '/rest/resource', hrefUrl: '/resource' });
     });
   });
   

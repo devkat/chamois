@@ -16,6 +16,7 @@ import scala.xml.Attribute
 import scala.xml.Text
 import org.chamois.util.MediaType
 import org.chamois.web.HtmlLinkRewriter
+import org.chamois.util.Path
 
 case class Doc(val uuid: UUID, val lang: String)
   
@@ -52,9 +53,12 @@ object LenyaImporter {
       val res = Resource.createRecord
       res.slug.set(lang)
       resources.insert(res)
-      (site \ "node") foreach (importNode(area, lang, Some(res)))
     }
+    
+    (site \ "node") foreach (importNode(area) _)
   }
+  
+  val langAttr = "@{http://www.w3.org/XML/1998/namespace}lang"
   
   def getDocs(area:File)(xmlNode:scala.xml.Node): Set[Doc] = {
     val docs = (xmlNode \ "@uuid") match {
@@ -62,7 +66,7 @@ object LenyaImporter {
       case n => {
         val uuid = UUID.fromString(n.text)
         (xmlNode \ "label").toSet.map { l:scala.xml.Node =>
-          Doc(uuid, (l \ "@{http://www.w3.org/XML/1998/namespace}lang").text)
+          Doc(uuid, (l \ langAttr).text)
         }
       }
     }
@@ -71,31 +75,26 @@ object LenyaImporter {
     docs ++ children
   }
   
-  def matchesLang(label:scala.xml.Node, lang:String) =
-    (label \ "@{http://www.w3.org/XML/1998/namespace}lang").text == lang
-  
-  def importNode(area:File, lang:String, parent:Option[Resource] = None)(xmlNode:scala.xml.Node)(implicit doc2uuid:Map[Doc, UUID]) {
+  def importNode(area:File, parentPath:Path = Path.root)(xmlNode:scala.xml.Node)(implicit doc2uuid:Map[Doc, UUID]) {
     val slug = (xmlNode \ "@id").text
     println("Importing node %s".format(slug))
     
-    val descendants = (xmlNode \\ "label").find(matchesLang(_, lang))
-    
-    if (descendants.isDefined) {
-      val uuid = UUID.fromString((xmlNode \ "@uuid").text)
+    val uuid = UUID.fromString((xmlNode \ "@uuid").text)
+
+    (xmlNode \ "label") foreach { label =>
+      val lang = (label \ langAttr).text
+      
       val newUuid = doc2uuid(Doc(uuid, lang))
       val res = Resource.createRecord
       res.uuid.set(newUuid)
       res.slug.set(slug)
-      parent foreach {p => res.parentId.set(Some(p.id))}
+      val fullParentPath = Path(lang :: Nil) / parentPath
+      Resource.findByPath(fullParentPath) foreach {p => res.parentId.set(Some(p.id))}
       resources.insert(res)
 
-      (xmlNode \ "label") foreach { label =>
-        if ((label \ "@{http://www.w3.org/XML/1998/namespace}lang").text == lang) {
-          importDoc(res, area, uuid, lang)
-        }
-      }
-      (xmlNode \ "node") foreach importNode(area, lang, Some(res)) _
+      importDoc(res, area, uuid, lang)
     }
+    (xmlNode \ "node") foreach importNode(area, parentPath / slug) _
   }
   
   def importDoc(res:Resource, area:File, uuid:UUID, lang:String)(implicit doc2uuid:Map[Doc, UUID]): Option[Resource] = {

@@ -14,6 +14,8 @@ import net.liftweb.json.JValue
 import net.liftweb.json.JArray
 import org.chamois.util.Path
 import java.util.UUID
+import net.liftweb.util.FieldIdentifier
+import net.liftweb.util.FieldError
 
 case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
 
@@ -48,8 +50,13 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
   }
   
   val slug = new StringField(this, 256) {
+    def validateUniqueSlug(slug:String): List[FieldError] =
+      Resource.findBySlug(slug, parent) match {
+        case Some(slug) => FieldError(this, "Slug already exists.") :: Nil
+        case None => Nil
+      }
     override def validations =
-      valMinLen(1, "Slug must not be empty.") _ :: super.validations
+      valMinLen(1, "Slug must not be empty.") _ :: validateUniqueSlug _ :: super.validations
   }
   
   @Column(name="parent_id")
@@ -101,7 +108,7 @@ object Resource extends Resource with MetaRecord[Resource] {
   def rootResources =
     from(resources)(n => where(n.parentId isNull) select(n))
     
-  def findBySlug(slug:String, parent:Option[Resource] = None) =
+  def findBySlug(slug:String, parent:Option[Resource] = None): Option[Resource] =
     parent match {
       case Some(parent) => from(resources)(n => where(n.slug === slug and parent.id === n.parentId) select(n)).headOption
       case None => from(resources)(n => where(n.slug === slug and (n.parentId isNull)) select(n)).headOption

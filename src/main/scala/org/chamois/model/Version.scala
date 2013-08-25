@@ -17,6 +17,8 @@ import scala.xml.NodeSeq
 import java.io.ByteArrayInputStream
 import org.chamois.util.MediaType
 import java.util.UUID
+import net.liftweb.util.FieldError
+import net.liftweb.util.FieldIdentifier
 
 case class Version private() extends Record[Version]
     with KeyedEntity[CompositeKey2[LongField[Version], IntField[Version]]] {
@@ -33,8 +35,18 @@ case class Version private() extends Record[Version]
   val created = new DateTimeField(this)
   val content = new BinaryField(this)
   
+  def validateMediaType(f:FieldIdentifier)(s:String):List[FieldError] = {
+    MediaType.parse(s) match {
+      case Some(t) => Nil
+      case None => FieldError(f, "Invalid media type.") :: Nil
+    }
+  }
+  
   @Column(name="media_type")
-  val mediaTypeString = new StringField(this, 256)
+  val mediaTypeString = new StringField(this, 256) {
+    override def validations =
+      validateMediaType(this) _ :: super.validations
+  }
   
   def mediaType = MediaType.parse(mediaTypeString.get).get
   

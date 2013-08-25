@@ -72,8 +72,10 @@ define([
       });
     }
     
-    parent.addClass('tree');
-    loadChildren(parent, '', settings);
+    if (!parent.hasClass('tree')) {
+      parent.addClass('tree');
+      loadChildren(parent, '', settings);
+    }
   };
 
 });
