@@ -26,6 +26,7 @@ object CreateResource extends BootstrapScreen {
       NothingOtherValueInitializer)
   
   addFields(() => resource.slug)
+  addFields(() => resource.name)
 
   override def localSetup() {
     super.localSetup()

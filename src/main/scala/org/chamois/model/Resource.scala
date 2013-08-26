@@ -48,7 +48,9 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
     ChamoisDb.versions.insert(version)
     version
   }
-  
+
+  val name = new StringField(this, 256)
+
   val slug = new StringField(this, 256) {
     def validateUniqueSlug(slug:String): List[FieldError] =
       Resource.findBySlug(slug, parent) match {
