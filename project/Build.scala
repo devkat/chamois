@@ -56,6 +56,7 @@ object ChamoisBuild extends Build {
         "ch.becompany" % "fugue-icons-lift" % "3.4.1",
         "eu.getintheloop" %% "lift-shiro" % "0.0.7-201306201324",
         "net.databinder.dispatch" %% "dispatch-core" % "0.9.4",
+        "se.fishtank" %% "css-selectors-scala" % "0.1.2",
         "commons-collections" % "commons-collections" % "3.2.1",
         //"commons-beanutils" % "commons-beanutils" % "20030211.134440",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.11.v20130520" % "container,test",

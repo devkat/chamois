@@ -47,6 +47,7 @@
       <column name="uuid" type="uuid">
         <constraints unique="true" nullable="false"/>
       </column>
+      <column name="name" type="varchar(256)"/>
       <column name="slug" type="varchar(256)">
         <constraints nullable="false"/>
       </column>

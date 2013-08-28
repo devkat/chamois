@@ -8,7 +8,12 @@ define([
 ) {
   
   $(document).ready(function() {
+    /*
     $('span.has-error').closest('.form-group').addClass('has-error');
+    
+    $('label.label').removeClass('label');
+    $('span > input[type=radio]').parent().wrap($('<div>').addClass('radio')).wrap($('<label>'));
+    */
     
     _.each($('.popover-trigger'), function(node) {
       $(node).popover({

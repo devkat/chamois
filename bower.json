@@ -5,7 +5,6 @@
   "dependencies": {
     "aloha": "alohaeditor/Aloha-Editor#alohaeditor-0.23.12",
     "bootstrap": "3.0.0",
-    "bootstrap-glyphicons": "twbs/bootstrap-glyphicons#bdd2cbfba0ca407c6b7e45d84558de6aec010546",
     "bootstrap-growl": "1.1.0",
     "dateFormat": "phstc/jquery-dateFormat",
     "font-awesome": "3.2.1",
@@ -19,6 +18,7 @@
     "moment": "2.0.0",
     "requirejs": "2.1.8",
     "sprintf": "alexei/sprintf.js",
-    "underscore": "1.4.4"
+    "underscore": "1.4.4",
+    "wysihtml5": "#56960b31adc37e07797382d8e8b10109f206b19c"
   }
 }
