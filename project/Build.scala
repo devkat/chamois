@@ -34,11 +34,11 @@ object BuildSettings {
   )
 }
 
-object ChamoisBuild extends Build {
+object ArribaBuild extends Build {
 
   val liftVersion = "2.5"
 
-  lazy val root = Project("chamois", file("."),
+  lazy val root = Project("arriba", file("."),
     settings = BuildSettings.buildSettings ++ Seq(
       // the root is just an aggregator so dont publish a JAR
       publishArtifact in (Compile, packageBin) := false,
@@ -52,8 +52,7 @@ object ChamoisBuild extends Build {
         //"net.liftmodules" %% "lift-openid" % liftVersion % "compile->default",
         "net.liftmodules" %% "openid" % "2.5-RC4-1.2" excludeAll(ExclusionRule(organization = "net.liftweb")),
         "net.liftweb" %% "lift-squeryl-record" % liftVersion,
-        "net.devkat" % "dgrid-lift" % "1.0-SNAPSHOT",
-        "ch.becompany" % "fugue-icons-lift" % "3.4.1",
+        "net.devkat" %% "lift-bootstrap" % "1.0-SNAPSHOT",
         "eu.getintheloop" %% "lift-shiro" % "0.0.7-201306201324",
         "net.databinder.dispatch" %% "dispatch-core" % "0.9.4",
         "se.fishtank" %% "css-selectors-scala" % "0.1.2",
@@ -74,10 +73,10 @@ object ChamoisBuild extends Build {
       (webappResources in Compile) <+= (resourceManaged in Compile)(_ / "webapp")
     ) ++
     liquibaseSettings ++ Seq (
-      liquibaseUrl := "jdbc:postgresql:chamois",
+      liquibaseUrl := "jdbc:postgresql:arriba",
       liquibaseDriver := "org.postgresql.Driver",
-      liquibaseUsername := "chamois",
-      liquibasePassword := "chamois",
+      liquibaseUsername := "arriba",
+      liquibasePassword := "arriba",
       liquibaseChangelog := "src/main/migrations/changelog.xml"
     )
   )

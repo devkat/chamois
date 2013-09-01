@@ -34,11 +34,6 @@ class Boot {
       DriverManager.getConnection(Props.get("db.url").get, Props.get("db.user").get, Props.get("db.password").get),
       new PostgreSqlAdapter))
     S.addAround(SquerylRecord.buildLoanWrapper)
-    /*
-    transaction {
-      IconhubDb.create
-    }
-    */
     
     LiftRules.resourceNames = "iconhub" :: Nil
     LiftRules.localeCalculator = (_) => Locale.ENGLISH
@@ -64,19 +59,21 @@ class Boot {
     LiftRules.addToPackages("shiro")
     
     val items = List[ConvertableToMenu](
-      Menu("home", "Home") / "index" >> DefaultLogin >> Loc.Hidden,
-      Menu("login", "Login") / "login" >> DefaultLogin >> RequireNoAuthentication,
-      Menu("my_account", "My account") / "my" / "account" >> PlaceHolder >> RequireAuthentication submenus(
-        (Menu("My profile") / "profile" >> RequireAuthentication) :: Shiro.menus
+      Menu("home", "Home") / "arriba" / "index" >> DefaultLogin >> Loc.Hidden,
+      /*
+      Menu("login", "Login") / "arriba" / "login" >> DefaultLogin >> RequireNoAuthentication,
+      Menu("my_account", "My account") / "arriba" / "my" / "account" >> PlaceHolder >> RequireAuthentication submenus(
+        (Menu("My profile") / "arriba" / "profile" >> RequireAuthentication) :: Shiro.menus
       ),
       //Menu("Role Test") / "restricted" >> RequireAuthentication >> HasRole("admin"),
-      Menu("Sign up") / "signup" >> RequireNoAuthentication >> Loc.Hidden,
-      Menu(ResourceLoc), // >> RequireAuthentication
-      Menu(MercuryLoc),
-      Menu.i("Create resource") / "create",
-      Menu.i("Edit resource") / "edit",
-      Menu.i("Import from Lenya") / "import-lenya",
-      Menu("About") / "about" >> Hidden >> LocGroup("footer")
+      Menu("Sign up") / "arriba" / "signup" >> RequireNoAuthentication >> Loc.Hidden,
+      //Menu(MercuryLoc),
+      Menu("About") / "arriba" / "about" >> Hidden >> LocGroup("footer"),
+       */
+      Menu.i("Create resource") / "arriba" / "create",
+      Menu.i("Edit resource") / "arriba" / "edit",
+      Menu.i("Import") / "arriba" / "import",
+      Menu(ResourceLoc) // >> RequireAuthentication
     )
     
     def addCssClass(c:ConvertableToMenu) = c match {

@@ -17,6 +17,7 @@ import net.liftweb.http.FieldBinding
 import net.liftweb.util.FieldContainer
 import net.liftweb.http.FieldBinding._
 import org.arriba.content.Template
+import net.devkat.lift.http.CssBoundBootstrapScreen
 
 class CreateResource extends CssBoundBootstrapScreen {
   
@@ -85,6 +86,6 @@ class CreateResource extends CssBoundBootstrapScreen {
     }
   }
   
-  override protected def redirectBack() = S.redirectTo("/resource" + resource.href)
+  override protected def redirectBack() = S.redirectTo(resource.href)
 
 }

@@ -56,7 +56,7 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
 
   val slug = new StringField(this, 256) {
     def validateUniqueSlug(slug:String): List[FieldError] =
-      Resource.findBySlug(slug, parent) match {
+      Resource.findBySlug(slug, parentId.get) match {
         case Some(slug) => FieldError(this, "Slug already exists.") :: Nil
         case None => Nil
       }
@@ -113,20 +113,20 @@ object Resource extends Resource with MetaRecord[Resource] {
   def rootResources =
     from(resources)(n => where(n.parentId isNull) select(n))
     
-  def findBySlug(slug:String, parent:Option[Resource] = None): Option[Resource] =
-    parent match {
-      case Some(parent) => from(resources)(n => where(n.slug === slug and parent.id === n.parentId) select(n)).headOption
+  def findBySlug(slug:String, parentId:Option[Long] = None): Option[Resource] =
+    parentId match {
+      case Some(pid) => from(resources)(n => where(n.slug === slug and pid === n.parentId) select(n)).headOption
       case None => from(resources)(n => where(n.slug === slug and (n.parentId isNull)) select(n)).headOption
     }
   
-  def findByPath(path:Path, parent:Option[Resource] = None): Option[Resource] =
+  def findByPath(path:Path, parentId:Option[Long] = None): Option[Resource] =
     path.slugs match {
       case slug :: childPath => {
-        val node = findBySlug(slug, parent)
-        node match {
+        val parent = findBySlug(slug, parentId)
+        parent match {
           case parentOption @ Some(p) => childPath match {
-            case Nil => node
-            case _ => findByPath(childPath, parentOption)
+            case Nil => parent
+            case _ => findByPath(childPath, parent map {_.id})
           }
           case None => None
         }

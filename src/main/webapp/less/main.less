@@ -11,6 +11,11 @@
 
 @taupe: #483C32;
 @beige: #F5F5DC;
+@maroon: #800000;
+
+@col-bg: #333333;
+@col-warn: #DD4225;
+@col-fg: #CCCCCC;
 
 body {
   padding-top: 60px;
@@ -18,12 +23,14 @@ body {
 
 .arriba {
 
+  background-color: @col-bg;
+
   .toolbar {
     margin-bottom: 5px;
   }
 
     .btn-nav {
-      background-color: @beige;
+      background-color: @col-bg;
       border-color: #cccccc;
     }
 
@@ -32,13 +39,13 @@ body {
     }
     
     .navbar.navbar-inverse {
-      background-color: @taupe;
+      background-color: @col-bg;
       a.navbar-brand {
         font-family: 'Condiment', cursive;
         font-size: 36px;
         position: relative;
         top: 10px;
-        color: #FFFFFF;
+        color: @col-fg;
         //text-shadow: 1px 1px #999999;
       }
     }
@@ -90,3 +97,32 @@ body {
     */
 
 }
+
+.drawer {
+  .translate3d(0, -128px, 0);
+  //.transition(transform 1s linear);
+  
+  -webkit-transition:-webkit-transform 0.25s linear;
+  -moz-transition:-moz-transform 0.25s linear;
+  -o-transition:-o-transform 0.25s linear;
+  transition:transform 0.25s linear;
+  
+  &.in {
+    .translate3d(0, 0, 0);
+  }
+}
+
+  .drawer-trigger {
+  position: absolute;
+  width: 100%;
+    &.collapsed {
+    }
+    opacity: 0;
+    background-color: @col-bg;
+    color: @col-fg;
+    text-align: center;
+    .transition(opacity .5s linear);
+    &:hover {
+      opacity: 1;
+    }
+  }

@@ -20,7 +20,7 @@ object Resources {
   def listResources(n:NodeSeq): NodeSeq =
     <ul>
       {Resource.findAll.map(res =>
-        <li><a href={"/resource/" + res.uuid}>{res.uuid}</a></li>)}
+        <li><a href={res.href}>{res.uuid}</a></li>)}
     </ul>
   
   def withCurrentVersion(res:Resource)(f: Version => NodeSeq) =
@@ -66,10 +66,14 @@ object Resources {
     <a class="btn btn-default" href={"/edit?path=" + res.href}>{n}</a>
     //<a class="btn btn-default" href={"/mercury" + res.href}>{n}</a>
     
-  def createLink(res:Resource)(n:NodeSeq): NodeSeq =
-    <a class="btn btn-default" href={"/create?parent=" + res.href}>{n}</a>
+  val createLink: NodeSeq => NodeSeq = createLink(None) _
+    
+  def createLink(parent:Option[Resource])(n:NodeSeq): NodeSeq =
+    <a class="btn btn-default" href={"/arriba/create" + parent.map("?parent=" + _.href).getOrElse("")}>{n}</a>
 
-  def breadcrumb(res:Resource)(n:NodeSeq) = {
+  val breadcrumb: NodeSeq => NodeSeq = breadcrumb(List("", "")) _
+  
+  def breadcrumb(path:Path)(n:NodeSeq) = {
     def steps(p:Path, parentPath:String = "/document"): NodeSeq = p.slugs match {
       case head :: Nil => <li class="active">{head}</li>
       case head :: tail => {
@@ -78,7 +82,7 @@ object Resources {
       }
       case Nil => Nil
     }
-    <ul class="breadcrumb">{n \ "_"}{steps(res.path)}</ul>
+    <ul class="breadcrumb">{n \ "_"}{steps(path)}</ul>
   }
   
   /*

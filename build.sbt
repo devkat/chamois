@@ -1,6 +1,6 @@
-organization in ThisBuild := "org.chamois"
+organization in ThisBuild := "org.arriba"
 
-name in ThisBuild         := "chamois"
+name in ThisBuild         := "arriba"
 
 version in ThisBuild      := "1.0-SNAPSHOT"
 

@@ -15,6 +15,11 @@ define([
     $('span > input[type=radio]').parent().wrap($('<div>').addClass('radio')).wrap($('<label>'));
     */
     
+    $('.drawer-trigger').click(function(e) {
+      $($(e.target).attr('data-target')).toggleClass('in');
+    });
+    
+    
     _.each($('.popover-trigger'), function(node) {
       $(node).popover({
         html: true,

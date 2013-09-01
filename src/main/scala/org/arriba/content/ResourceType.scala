@@ -8,6 +8,7 @@ import org.arriba.model.Version
 import scala.xml.Node
 import net.liftweb.util.Html5
 import java.io.ByteArrayInputStream
+import net.liftweb.http.RewriteResponse
 
 trait ResourceType {
   
@@ -15,6 +16,8 @@ trait ResourceType {
   
   def html(v:Version): Box[Node]
 
+  def isHtml: Boolean
+  
 }
 
 object ResourceTypeRegistry {
@@ -39,7 +42,7 @@ object ResourceTypeRegistry {
   
   def find(mediaType: MediaType): Option[ResourceType] =
     resourceTypes.find(_.matches(mediaType))
-  
+    
 }
 
 object HtmlResourceType extends ResourceType {
@@ -53,5 +56,6 @@ object HtmlResourceType extends ResourceType {
   def html(v:Version) =
     Html5.parse(new ByteArrayInputStream(v.content.get))
   
+  def isHtml = true
   
 }

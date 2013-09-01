@@ -20,7 +20,7 @@ import org.arriba.util.Path
 
 case class Doc(val uuid: UUID, val lang: String)
   
-object LenyaImporter {
+object LenyaImporter extends FileImporter {
   
   def importContent(file:File) {
   val areas = file.listFiles(new FilenameFilter() {
@@ -158,11 +158,7 @@ object LenyaImporter {
       }
       // don't import old versions of media files
       case Some(mType) if doc.numVersions == 0 => newVersion { v =>
-        val in = new FileInputStream(contentFile)
-        val arr = new Array[Byte](contentFile.length.toInt)
-        in.read(arr)
-        in.close()
-        v.content.set(arr)
+        v.content.set(read(contentFile))
       }
       case _ => {}
     }

@@ -9,6 +9,12 @@ case class Path(val slugs:List[String]) {
   def /(slug:String) = Path(slugs ::: slug :: Nil)
   
   def /(p:Path) = Path(slugs ::: p.slugs)
+  
+  def parent = slugs match {
+    case Nil => Path(Nil)
+    case l => Path(l.dropRight(1))
+  }
+  
 }
 
 object Path {

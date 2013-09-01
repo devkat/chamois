@@ -54,7 +54,7 @@ define([
         if (currentPath.match(new RegExp('^' + nodePath))) {
           childrenElem.collapse({toggle: true});
         }
-        container.append(elem);
+        return elem;
       }
 
       var loader = $('<span class="icon icon-rotate icon-refresh"></span>');
@@ -64,7 +64,11 @@ define([
         dataType: 'json',
         success: function(data) {
           loader.remove();
-          _.each(data, renderNode);
+          container.append(
+            path === '' && data.length === 0
+              ? "No resources."
+              : _.map(data, renderNode)
+          );
         },
         error: function(error) {
           debugger;
@@ -74,7 +78,7 @@ define([
     
     if (!parent.hasClass('tree')) {
       parent.addClass('tree');
-      loadChildren(parent, '', settings);
+      loadChildren(parent, '');
     }
   };
 
