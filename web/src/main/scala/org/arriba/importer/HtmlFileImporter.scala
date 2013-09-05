@@ -28,13 +28,8 @@ object HtmlFileImporter extends FileImporter {
     }) foreach importResources(parent) _
   }
 
-  def importResources(parent: Option[Long] = None)(f: File) {
+  def importResources(folderId: Option[Long] = None)(f: File) {
     print("Importing " + f + " -> ")
-    
-    val node = Node.createRecord
-    node.slug.set(baseName(f.getName))
-    node.parentId.set(parent)
-    nodes.insert(node)
     
     /*
     def setSlug(slug:String) {
@@ -48,16 +43,21 @@ object HtmlFileImporter extends FileImporter {
     
     r.slug.set(f.getName)
      */
-
+    val slug = baseName(f.getName)
     if (f.isDirectory()) {
       println
-      importResourcesInDir(Some(node.id))(f)
+      val folder = Folder.createRecord
+      folder.slug.set(slug)
+      folder.parentId.set(folderId)
+      folders.insert(folder)
+      importResourcesInDir(Some(folder.id))(f)
     } else {
       MediaType.parse(tika.detect(f)) match {
         case Some(mediaType) => {
           println(mediaType)
           val r = Resource.createRecord
-          r.nodeId.set(node.id)
+          r.folderId.set(folderId)
+          r.slug.set(slug)
           r.name.set(f.getName)
           r.setMediaType(mediaType)
           r.newVersion(read(f))

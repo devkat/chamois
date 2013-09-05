@@ -33,7 +33,7 @@ class Import extends BootstrapScreen {
   
   def finish() {
     
-    List(resources, versions, nodes) foreach {_.deleteWhere(r => 1 === 1)}
+    List(resources, versions, folders) foreach {_.deleteWhere(r => 1 === 1)}
     
     val file = new File(path.get)
     if (file.isDirectory()) {

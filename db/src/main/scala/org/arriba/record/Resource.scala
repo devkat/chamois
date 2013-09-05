@@ -45,14 +45,11 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
   
   def newVersion(content: Array[Byte]) = {
     val version = Version.createRecord
-    println("current version id before: " + currentVersionId.get)
     if (currentVersionId.get != currentVersionId.defaultValue)
       version.previousVersionId.set(Some(currentVersionId.get))
     version.content.set(content)
     ArribaDb.versions.insert(version)
-    println("Version id:             " + version.idField.get + " - " + version.id)
     currentVersionId.set(version.id)
-    println("current version id after:  " + currentVersionId.get)
     version
   }
   
@@ -66,13 +63,15 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
 
   val name = new StringField(this, 256)
   
-  @Column(name="node_id")
-  val nodeId = new LongField(this)
+  @Column(name="folder_id")
+  val folderId = new OptionalLongField(this)
   
-  def node = nodes.lookup(nodeId.get).get
+  def folder = folderId.get map (folders.lookup(_).get)
 
-  def path = node.path
+  def path = folder.map(_.path).getOrElse(Path.root) / slug.get
   
+  val slug = new StringField(this, 256)
+
   def href = path.toString + MediaType.getDefaultExtension(mediaType) match {
     case "" => ""
     case ext => "." + ext
@@ -101,14 +100,28 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
 
 object Resource extends Resource with MetaRecord[Resource] {
   
+  def rootResources =
+    from(resources)(n => where(n.folderId isNull) select(n))
+
   def findByUuid(uuid:UUID): Option[Resource] =
     from(resources)(d => where(d.uuid === uuid) select(d)).headOption
+  
+  def folderClause(r:Resource, folder:Option[Folder]) = folder match {
+    case Some(f) => r.folderId === f.id
+    case None => r.folderId.isNull
+  }
     
-  def findByUrl(path:Path, ext:String) =
+  def findByUrl(folderPath:Path, slug:String, ext:String) =
     for {
       mediaType <- MediaType.byExtension(ext)
-      node <- Node.findByPath(path)
-      resource <- from(resources)(r => where(r.nodeId === node.id and r.mediaTypeString === mediaType.toString) select(r)).headOption
+      folderOption <- folderPath match {
+        case Path.root => Some(None)
+        case p => Folder.findByPath(p) map { Some(_) }
+      }
+      resource <- from(resources)(r => where(
+          folderClause(r, folderOption) and
+          r.slug === slug and
+          r.mediaTypeString === mediaType.toString) select(r)).headOption
     } yield (resource)
 
   def findAll: List[Resource] =

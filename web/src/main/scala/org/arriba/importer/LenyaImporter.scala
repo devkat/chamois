@@ -50,9 +50,9 @@ object LenyaImporter extends FileImporter {
       //docs map { doc => (doc -> UUID.randomUUID()) }
     
     List("en", "de", "fr", "it") foreach {lang =>
-      val node = Node.createRecord
-      node.slug.set(lang)
-      nodes.insert(node)
+      val folder = Folder.createRecord
+      folder.slug.set(lang)
+      folders.insert(folder)
     }
     
     (site \ "node") foreach (importNode(area) _)
@@ -84,15 +84,15 @@ object LenyaImporter extends FileImporter {
     (xmlNode \ "label") foreach { label =>
       val lang = (label \ langAttr).text
       
-      val node = Node.createRecord
-      node.slug.set(slug)
+      val folder = Folder.createRecord
+      folder.slug.set(slug)
       val fullParentPath = Path(lang :: Nil) / parentPath
-      Node.findByPath(fullParentPath) foreach {p => node.parentId.set(Some(p.id))}
-      nodes.insert(node)
+      Folder.findByPath(fullParentPath) foreach {p => folder.parentId.set(Some(p.id))}
+      folders.insert(folder)
       
       val newUuid = doc2uuid(Doc(uuid, lang))
       val res = Resource.createRecord
-      res.nodeId.set(node.id)
+      res.folderId.set(Some(folder.id))
       res.uuid.set(newUuid)
       resources.insert(res)
 

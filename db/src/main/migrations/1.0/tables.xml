@@ -40,7 +40,7 @@
       </column>
     </createTable>
     
-    <createTable tableName="node">
+    <createTable tableName="folder">
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false"/>
       </column>
@@ -49,11 +49,11 @@
       </column>
       <column name="parent_id" type="bigint"/>
     </createTable>
-    <addForeignKeyConstraint constraintName="node__parent_id"
-      baseTableName="node" baseColumnNames="parent_id"
-      referencedTableName="node" referencedColumnNames="id"/>
-    <addUniqueConstraint constraintName="unique_node__parent_id__slug"
-      tableName="node" columnNames="parent_id, slug"/>
+    <addForeignKeyConstraint constraintName="folder__parent_id"
+      baseTableName="folder" baseColumnNames="parent_id"
+      referencedTableName="folder" referencedColumnNames="id"/>
+    <addUniqueConstraint constraintName="unique_folder__parent_id__slug"
+      tableName="folder" columnNames="parent_id, slug"/>
     
     <createTable tableName="version">
       <column name="id" type="bigint" autoIncrement="true">
@@ -85,8 +85,9 @@
       <column name="id" type="bigint" autoIncrement="true">
         <constraints primaryKey="true" nullable="false"/>
       </column>
-      <column name="node_id" type="bigint">
-        <constraints unique="true" nullable="false"/>
+      <column name="folder_id" type="bigint"/>
+      <column name="slug" type="varchar(256)">
+        <constraints nullable="false"/>
       </column>
       <column name="uuid" type="uuid">
         <constraints unique="true" nullable="false"/>
@@ -99,12 +100,14 @@
         <constraints nullable="false"/>
       </column>
     </createTable>
-    <addForeignKeyConstraint constraintName="resource__node_id"
-      baseTableName="resource" baseColumnNames="node_id"
-      referencedTableName="node" referencedColumnNames="id"/>
+    <addForeignKeyConstraint constraintName="resource__folder_id"
+      baseTableName="resource" baseColumnNames="folder_id"
+      referencedTableName="folder" referencedColumnNames="id"/>
     <addForeignKeyConstraint constraintName="resource__current_version_id"
       baseTableName="resource" baseColumnNames="current_version_id"
       referencedTableName="version" referencedColumnNames="id"/>
+     <addUniqueConstraint constraintName="unique_resource__folder_slug_mediatype"
+      tableName="resource" columnNames="folder_id, slug, media_type"/>
  
   </changeSet>
 

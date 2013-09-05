@@ -20,20 +20,26 @@ object ResourcesRest extends RestHelper { //}RestService[Document]("document") {
   
   lazy val tika = new Tika();
 
-  implicit def toJson(node:Node) =
-    ("slug" -> node.slug.get) ~
-    ("hasChildren" -> node.hasChildren)
+  implicit def toJson(folder:Folder) =
+    ("slug" -> folder.slug.get) ~
+    ("hasChildren" -> folder.hasChildren)
+  
+  implicit def toJson(resource:Resource) =
+    ("slug" -> resource.slug.get) ~
+    ("hasChildren" -> false)
   
   serve( "rest" / "resource" prefix {
     
-    case Nil JsonGet _ => Node.rootNodes.toList: JArray
+    case Nil JsonGet _ => (Folder.rootFolders.toSeq:JArray) ++ (Resource.rootResources.toSeq:JArray)
     
-    case Node(n) JsonGet _ => n.children: JArray
+    case Folder(f) JsonGet _ => f.children: JArray
     
-    case Node(n) Get _ => n.resource match {
+    /*
+    case Folder(f) Get _ => n.resource match {
       case None => NotFoundResponse()
       case Some(r) => InMemoryResponse(r.currentVersion.content.get, ("Content-Type", r.mediaType.toString) :: Nil, Nil, 200)
     }
+    */
   })
   /*
   serve( "api" / "document" prefix {

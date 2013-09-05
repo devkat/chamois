@@ -3,7 +3,7 @@ package org.arriba.snippet
 import net.liftweb.squerylrecord.RecordTypeMode._
 import net.liftweb.http.S
 import org.arriba.record.ArribaDb._
-import org.arriba.record.{Node, Resource, Version}
+import org.arriba.record.{Folder, Resource, Version}
 import java.util.UUID
 import scala.xml.{Elem,Text}
 import net.liftweb.common._
@@ -24,7 +24,7 @@ class CreateResource extends CssBoundBootstrapScreen {
   
   def formName = "create"
 
-  object node extends ScreenVar[Node](Node.createRecord)
+  object folder extends ScreenVar[Option[Folder]](None)
   object resource extends ScreenVar[Resource](Resource.createRecord)
   /*
   val parentPathField = makeField[String, Nothing](
@@ -38,8 +38,8 @@ class CreateResource extends CssBoundBootstrapScreen {
   addFields(() => resource.name)
        */
       
-  field("Parent path", node.parent.map(_.path).getOrElse(Path.root).toString, FieldBinding("parentPath", Self))
-  field(node.slug, FieldBinding("slug"))
+  field("Folder", folder.map(_.path).getOrElse(Path.root).toString, FieldBinding("folder", Self))
+  field(resource.slug, FieldBinding("slug"))
   field(resource.name, FieldBinding("name"))
 
   val templates = DefaultTemplates.templates map { case (key, t) => (key, t.name) } toSeq
@@ -55,16 +55,16 @@ class CreateResource extends CssBoundBootstrapScreen {
   override def localSetup() {
     super.localSetup()
     //DefaultTemplates.init()
-    val parent:Option[Node] = S.param("parent").map(Path.unapply(_)) match {
-      case Full(parPath) => {
-        parPath match {
+    val f:Option[Folder] = S.param("folder").map(Path.unapply(_)) match {
+      case Full(path) => {
+        path match {
           case Path.root => None
-          case path => Node.findByPath(path) match {
+          case path => Folder.findByPath(path) match {
             case None => {
-              S.notice("Parent resource " + path + " not found, creating root resource.")
+              S.notice("Folder " + path + " not found, creating resource at root path.")
               None
             }
-            case r => r
+            case f => f
           }
         }
       }
@@ -74,11 +74,9 @@ class CreateResource extends CssBoundBootstrapScreen {
         None
       }
     }
-    node.parentId.set(parent map (_.id))
-    nodes.insert(node)
-    
+    folder.set(f)
+    resource.folderId.set(f map (_.id))
     resource.uuid.set(UUID.randomUUID)
-    resource.nodeId.set(node.id)
   }
   
   def finish() {

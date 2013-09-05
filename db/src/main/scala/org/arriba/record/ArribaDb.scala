@@ -10,7 +10,7 @@ object ArribaDb extends Schema {
   
   val users = table[User]("users")
   val roles = table[Role]("role")
-  val nodes = table[Node]("node")
+  val folders = table[Folder]("folder")
   val resources = table[Resource]("resource")
   val versions = table[Version]("version")
 
@@ -18,14 +18,14 @@ object ArribaDb extends Schema {
       u.email defineAs(unique, indexed)
   ))
   
-  for (tab <- List(users, roles, resources, nodes, versions)) {
+  for (tab <- List(users, roles, resources, folders, versions)) {
     val keyed = tab.asInstanceOf[Table[KeyedRecord[Long]]]
     on(keyed)(t => declare(
           t.idField defineAs(autoIncremented(tab.name + "_id_seq"))
     ))
   }
   
-  val nodeToChildren = oneToManyRelation(nodes, nodes).
+  val folderToChildren = oneToManyRelation(folders, folders).
     via((parent, child) => child.parentId === parent.id)
     
   val userToRole =

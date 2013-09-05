@@ -19,18 +19,18 @@ import net.liftweb.util.FieldError
 import org.arriba.content.MediaType
 import net.liftweb.common._
 
-case class Node private() extends Record[Node] with KeyedRecord[Long] {
+case class Folder private() extends Record[Folder] with KeyedRecord[Long] {
 
-  override def meta = Node
+  override def meta = Folder
   
   @Column(name="id")
   override val idField = new LongField(this)
   
-  def delete_! = nodes.delete(id)
+  def delete_! = folders.delete(id)
   
   val slug = new StringField(this, 256) {
     def validateUniqueSlug(slug:String): List[FieldError] =
-      Node.findBySlug(slug, parentId.get) match {
+      Folder.findBySlug(slug, parentId.get) match {
         case Some(slug) => FieldError(this, "Slug already exists.") :: Nil
         case None => Nil
       }
@@ -41,14 +41,14 @@ case class Node private() extends Record[Node] with KeyedRecord[Long] {
   @Column(name="parent_id")
   val parentId = new OptionalLongField(this)
   
-  def parent = parentId.get.map(nodes.lookup(_)).flatten
+  def parent = parentId.get.map(folders.lookup(_)).flatten
 
-  def hasChildren = from(nodes)((child) =>
+  def hasChildren = from(folders)((child) =>
     where(this.id === child.parentId)
     compute(countDistinct(child.id))
     ).single.measures > 0
 
-  def children = nodeToChildren.left(this)
+  def children = folderToChildren.left(this)
   
   def path:Path = parent match {
     case Some(p) => p.path.slugs ::: slug.get :: Nil
@@ -60,24 +60,24 @@ case class Node private() extends Record[Node] with KeyedRecord[Long] {
     case Some(resource) => resource.href
   }
   
-  def resource = from(resources)(r => where(r.nodeId === id) select(r)).headOption
+  def resource = from(resources)(r => where(r.folderId === id) select(r)).headOption
 
 }
 
-object Node extends Node with MetaRecord[Node] {
+object Folder extends Folder with MetaRecord[Folder] {
   
   def unapply(path:List[String]) = findByPath(path)
   
-  def rootNodes =
-    from(nodes)(n => where(n.parentId isNull) select(n))
+  def rootFolders =
+    from(folders)(n => where(n.parentId isNull) select(n))
     
-  def findBySlug(slug:String, parentId:Option[Long] = None): Option[Node] =
+  def findBySlug(slug:String, parentId:Option[Long] = None): Option[Folder] =
     parentId match {
-      case Some(pid) => from(nodes)(n => where(n.slug === slug and pid === n.parentId) select(n)).headOption
-      case None => from(nodes)(n => where(n.slug === slug and (n.parentId isNull)) select(n)).headOption
+      case Some(pid) => from(folders)(n => where(n.slug === slug and pid === n.parentId) select(n)).headOption
+      case None => from(folders)(n => where(n.slug === slug and (n.parentId isNull)) select(n)).headOption
     }
   
-  def findByPath(path:Path, parentId:Option[Long] = None): Option[Node] =
+  def findByPath(path:Path, parentId:Option[Long] = None): Option[Folder] =
     path.slugs match {
       case slug :: childPath => {
         val parent = findBySlug(slug, parentId)

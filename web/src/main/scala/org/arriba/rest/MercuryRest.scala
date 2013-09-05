@@ -23,7 +23,7 @@ object MercuryRest extends RestHelper {
     // post document as JSON
     case path JsonPut json -> _ => {
       
-      Resource.findByUrl(path, "") match {
+      Resource.findByUrl(path.take(path.length - 1), path.last, "") match {
         case Some(resource) => {
           
           val markup = (json \ "content" \ "content" \ "value").extract[String]
