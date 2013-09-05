@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+  <changeSet id="1" author="devkat">
+  
+    <createTable tableName="role">
+      <column name="id" type="int" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(30)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+    </createTable>
+  
+    <createTable tableName="users">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="email" type="varchar(50)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="password_hash" type="varchar(128)"/>
+      <column name="password_salt" type="bytea"/>
+      <column name="created" type="${type.timestamp}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="user_to_role">
+      <column name="user_id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" references="users(id)" foreignKeyName="user_to_role__user_id"/>
+      </column>
+      <column name="role_id" type="int">
+        <constraints primaryKey="true" references="role(id)" foreignKeyName="user_to_role__role_id"/>
+      </column>
+    </createTable>
+    
+    <createTable tableName="node">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="slug" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="parent_id" type="bigint"/>
+    </createTable>
+    <addForeignKeyConstraint constraintName="node__parent_id"
+      baseTableName="node" baseColumnNames="parent_id"
+      referencedTableName="node" referencedColumnNames="id"/>
+    <addUniqueConstraint constraintName="unique_node__parent_id__slug"
+      tableName="node" columnNames="parent_id, slug"/>
+    
+    <createTable tableName="version">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="previous_version_id" type="bigint"/>
+      <column name="content" type="bytea">
+        <constraints nullable="false"/>
+      </column>
+      <column name="created" type="${type.timestamp}">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint constraintName="version__previous_version_id"
+      baseTableName="version" baseColumnNames="previous_version_id"
+      referencedTableName="version" referencedColumnNames="id"/>
+ 
+    <createTable tableName="version_to_tag">
+      <column name="version_id" type="bigint">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="tag" type="text"/>
+    </createTable>
+    <addForeignKeyConstraint constraintName="version_to_tag__version_id"
+      baseTableName="version_to_tag" baseColumnNames="version_id"
+      referencedTableName="version" referencedColumnNames="id"/>
+
+    <createTable tableName="resource">
+      <column name="id" type="bigint" autoIncrement="true">
+        <constraints primaryKey="true" nullable="false"/>
+      </column>
+      <column name="node_id" type="bigint">
+        <constraints unique="true" nullable="false"/>
+      </column>
+      <column name="uuid" type="uuid">
+        <constraints unique="true" nullable="false"/>
+      </column>
+      <column name="name" type="varchar(256)"/>
+      <column name="media_type" type="varchar(256)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="current_version_id" type="bigint">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+    <addForeignKeyConstraint constraintName="resource__node_id"
+      baseTableName="resource" baseColumnNames="node_id"
+      referencedTableName="node" referencedColumnNames="id"/>
+    <addForeignKeyConstraint constraintName="resource__current_version_id"
+      baseTableName="resource" baseColumnNames="current_version_id"
+      referencedTableName="version" referencedColumnNames="id"/>
+ 
+  </changeSet>
+
+</databaseChangeLog>
