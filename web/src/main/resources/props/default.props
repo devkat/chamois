@@ -1,5 +1,5 @@
 # Properties in this file will be read when running in dev mode
 db.driver=org.postgresql.Driver
-db.url=jdbc:postgresql:arriba
-db.user=arriba
-db.password=arriba
+db.url=jdbc:postgresql:moscato
+db.user=moscato
+db.password=moscato

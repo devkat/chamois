@@ -8,7 +8,7 @@ import net.liftweb.sitemap._
 import net.liftweb.sitemap.Loc._
 import Helpers._
 import java.sql.{ Connection, DriverManager }
-import org.arriba.model._
+import org.moscato.repo._
 import shiro.Shiro
 import shiro.sitemap.Locs._
 import net.liftweb.squerylrecord.RecordTypeMode._
@@ -16,11 +16,11 @@ import net.liftweb.squerylrecord.SquerylRecord
 import org.squeryl.Session
 import org.squeryl.adapters.PostgreSqlAdapter
 import java.util.Locale
-import org.arriba.auth.ArribaOpenIdVendor
-import org.arriba.sitemap._
+import org.moscato.auth.MoscatoOpenIdVendor
+import org.moscato.sitemap._
 import net.liftweb.sitemap.Menu.Menuable
 import net.liftweb.sitemap.Loc.MenuCssClass
-import org.arriba.rest._
+import org.moscato.rest._
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -37,8 +37,8 @@ class Boot {
     
     LiftRules.resourceNames = "iconhub" :: Nil
     LiftRules.localeCalculator = (_) => Locale.ENGLISH
-    LiftRules.dispatch.append(ArribaOpenIdVendor.dispatchPF)
-    LiftRules.snippets.append(ArribaOpenIdVendor.snippetPF)
+    LiftRules.dispatch.append(MoscatoOpenIdVendor.dispatchPF)
+    LiftRules.snippets.append(MoscatoOpenIdVendor.snippetPF)
     
     List(ResourcesRest, MercuryRest) foreach {
       LiftRules.statelessDispatch.append(_)
@@ -55,25 +55,25 @@ class Boot {
     //LiftRules.loggedInTest = Full(() => User.loggedIn_?)
 
     //LiftRules.addToPackages("eu.getintheloop") // Shiro
-    LiftRules.addToPackages("org.arriba")
+    LiftRules.addToPackages("org.moscato")
     LiftRules.addToPackages("shiro")
     
     val items = List[ConvertableToMenu](
-      Menu("home", "Home") / "arriba" / "index" >> DefaultLogin >> Loc.Hidden,
+      Menu("home", "Home") / "moscato" / "index" >> DefaultLogin >> Loc.Hidden,
       /*
-      Menu("login", "Login") / "arriba" / "login" >> DefaultLogin >> RequireNoAuthentication,
-      Menu("my_account", "My account") / "arriba" / "my" / "account" >> PlaceHolder >> RequireAuthentication submenus(
-        (Menu("My profile") / "arriba" / "profile" >> RequireAuthentication) :: Shiro.menus
+      Menu("login", "Login") / "moscato" / "login" >> DefaultLogin >> RequireNoAuthentication,
+      Menu("my_account", "My account") / "moscato" / "my" / "account" >> PlaceHolder >> RequireAuthentication submenus(
+        (Menu("My profile") / "moscato" / "profile" >> RequireAuthentication) :: Shiro.menus
       ),
       //Menu("Role Test") / "restricted" >> RequireAuthentication >> HasRole("admin"),
-      Menu("Sign up") / "arriba" / "signup" >> RequireNoAuthentication >> Loc.Hidden,
+      Menu("Sign up") / "moscato" / "signup" >> RequireNoAuthentication >> Loc.Hidden,
       //Menu(MercuryLoc),
-      Menu("About") / "arriba" / "about" >> Hidden >> LocGroup("footer"),
+      Menu("About") / "moscato" / "about" >> Hidden >> LocGroup("footer"),
        */
-      Menu.i("Create resource") / "arriba" / "create",
-      Menu.i("Edit resource") / "arriba" / "edit",
-      Menu.i("Edit with Mercury") / "arriba" / "mercury",
-      Menu.i("Import") / "arriba" / "import",
+      Menu.i("Create resource") / "moscato" / "create",
+      Menu.i("Edit resource") / "moscato" / "edit",
+      Menu.i("Edit with Mercury") / "moscato" / "mercury",
+      Menu.i("Import") / "moscato" / "import",
       Menu(ResourceLoc) // >> RequireAuthentication
     )
     

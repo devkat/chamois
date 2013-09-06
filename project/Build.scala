@@ -34,7 +34,7 @@ object BuildSettings {
   )
 }
 
-object ArribaBuild extends Build {
+object MoscatoBuild extends Build {
 
   val liftVersion = "2.5"
     
@@ -53,23 +53,16 @@ object ArribaBuild extends Build {
     ) ++
     net.virtualvoid.sbt.graph.Plugin.graphSettings
   
-  lazy val apiSettings = Seq(
-    libraryDependencies ++= Seq(
-      "org.apache.tika" % "tika-parsers" % "1.2"
-        excludeAll(ExclusionRule(organization = "org.bouncycastle"), ExclusionRule(organization = "org.aspectj"))
-    )
-  )
-  
-  lazy val api = Project("arriba-api", file("api")) settings(apiSettings:_*)
-
-  lazy val dbSettings = liquibaseSettings ++ Seq(
-      liquibaseUrl := "jdbc:postgresql:arriba",
+  lazy val repoSettings = liquibaseSettings ++ Seq(
+      liquibaseUrl := "jdbc:postgresql:moscato",
       liquibaseDriver := "org.postgresql.Driver",
-      liquibaseUsername := "arriba",
-      liquibasePassword := "arriba",
-      liquibaseChangelog := "db/src/main/migrations/changelog.xml"
+      liquibaseUsername := "moscato",
+      liquibasePassword := "moscato",
+      liquibaseChangelog := "repo/src/main/migrations/changelog.xml"
     ) ++ Seq(
     libraryDependencies ++= Seq(
+      "org.apache.tika" % "tika-parsers" % "1.4"
+        excludeAll(ExclusionRule(organization = "org.bouncycastle"), ExclusionRule(organization = "org.aspectj")),
       "org.squeryl" %% "squeryl" % "0.9.5-6",
       "org.apache.derby" % "derby" % "10.9.1.0",
       "postgresql" % "postgresql" % "9.1-901.jdbc4",
@@ -78,7 +71,7 @@ object ArribaBuild extends Build {
     )
   )
 
-  lazy val db = Project("arriba-db", file("db")) dependsOn(api) settings(dbSettings:_*)
+  lazy val repo = Project("moscato-repo", file("repo")) settings(repoSettings:_*)
 
   lazy val webappSettings = webSettings ++ Seq(
       libraryDependencies ++= Seq(
@@ -96,9 +89,9 @@ object ArribaBuild extends Build {
     (webappResources in Compile) <+= (resourceManaged in Compile)(_ / "webapp")
   )
 
-  lazy val web = Project("arriba-web", file("web")) dependsOn(api, db) settings(webappSettings:_*)
+  lazy val web = Project("moscato-web", file("web")) dependsOn(repo) settings(webappSettings:_*)
   
-  lazy val root = Project("arriba", file(".")) aggregate(api, db, web) settings(rootSettings:_*)
+  lazy val root = Project("moscato", file(".")) aggregate(repo, web) settings(rootSettings:_*)
   
-  override def projects = Seq(root, api, db, web)
+  override def projects = Seq(root, repo, web)
 }
