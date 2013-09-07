@@ -3,8 +3,9 @@
 //@import "../../../../../target/scala-2.10/resource_managed/main/webapp/vendor/bootstrap/less/bootstrap.less";
 
 // client-side compilation
-@import "/vendor/bootstrap/less/bootstrap.less";
+@import "/moscato/vendor/bootstrap/less/bootstrap.less";
 
+@import "reset.less";
 @import "tree.less";
 @import "lift.less";
 @import "edit.less";
@@ -13,12 +14,11 @@
 @beige: #F5F5DC;
 @maroon: #800000;
 
-@col-bg: #333333;
+@col-bg: #BFAC9B;
 @col-warn: #DD4225;
-@col-fg: #CCCCCC;
+@col-fg: #260612;
 
 body {
-  padding-top: 60px;
 }
 
 .moscato {
@@ -98,7 +98,8 @@ body {
 
 }
 
-.drawer {
+.drawer-container {
+  height: 100%;
   .translate3d(0, -128px, 0);
   //.transition(transform 1s linear);
   
@@ -109,20 +110,32 @@ body {
   
   &.in {
     .translate3d(0, 0, 0);
+    .drawer-trigger { opacity: 1; }
   }
 }
 
-  .drawer-trigger {
+.drawer {
+  height: 128px;
+  background-color: @col-bg;
+}
+
+.drawer-trigger {
   position: absolute;
   width: 100%;
-    &.collapsed {
-    }
-    opacity: 0;
-    background-color: @col-bg;
-    color: @col-fg;
-    text-align: center;
-    .transition(opacity .5s linear);
-    &:hover {
-      opacity: 1;
-    }
+  &.collapsed {
   }
+  opacity: 0;
+  background-color: @col-bg;
+  color: @col-fg;
+  text-align: center;
+  .transition(opacity .5s linear);
+  &:hover {
+    opacity: 1;
+  }
+}
+
+iframe#page {
+  width: 100%;
+  height: 100%;
+  border: none;
+}

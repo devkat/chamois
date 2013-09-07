@@ -48,7 +48,7 @@ case class Resource private() extends Record[Resource] with KeyedRecord[Long] {
     version.content.set(content)
     MoscatoDb.versions.insert(version)
     currentVersionId.set(version.id)
-    resources.update(this)
+    if (isPersisted) resources.update(this)
     version
   }
   

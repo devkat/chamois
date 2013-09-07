@@ -74,6 +74,7 @@ class Boot {
       Menu.i("Edit resource") / "moscato" / "edit",
       Menu.i("Edit with Mercury") / "moscato" / "mercury",
       Menu.i("Import") / "moscato" / "import",
+      Menu.i("Drawer") / "moscato" / "drawer",
       Menu(ResourceLoc) // >> RequireAuthentication
     )
     
@@ -100,6 +101,7 @@ class Boot {
 
     //LiftRules.loggedInTest = Full(() => User.loggedIn_?)
 
+    /*
     ResourceServer.allow {
       case "dojo" :: tail => true
       case "dijit" :: tail => true
@@ -109,6 +111,7 @@ class Boot {
       case "put-selector" :: tail => true
       case "fugue-icons-3.4.1" :: tail => true
     }
+    */
 
   }
 

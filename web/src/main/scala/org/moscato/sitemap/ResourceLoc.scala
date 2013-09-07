@@ -35,6 +35,7 @@ object ResourceLoc extends Loc[Resource] {
   }
   
   lazy val representations = Map(
+    Raw.name -> Raw,
     View.name -> View,
     Mercury.name -> Mercury
   )
