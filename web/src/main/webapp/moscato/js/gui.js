@@ -16,7 +16,7 @@ define([
     */
     
     $('.drawer-trigger').click(function(e) {
-      $($(e.target).attr('data-target')).toggleClass('in');
+      $($(e.delegateTarget).attr('data-target')).toggleClass('in');
     });
     
     

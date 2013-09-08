@@ -4,7 +4,7 @@ import scala.xml.Elem
 
 object Raw extends Representation {
   
-  def name = Some("raw")
+  def name = "raw"
   
   def template(html:Elem) = html
 

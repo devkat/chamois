@@ -1,18 +1,17 @@
 package org.moscato.representation
-
-import net.liftweb.common.Box
 import scala.xml.Node
 import net.liftweb.util._
 import net.liftweb.util.Helpers._
 import scala.xml.NodeSeq
 import scala.xml.Elem
 import net.liftweb.http.TemplateFinder
+import net.liftweb.common.Box.box2Option
 
 object View extends Representation {
 
-  def name = None
+  def name = ""
   
-  def template(html:Elem): Node = TemplateFinder(List("templates-hidden", "view")).get.head
+  def template(html:Elem): Node = TemplateFinder(List("templates-hidden", "moscato", "view")).get.head
   
   //def template(html:Elem): Node = insertDrawer(html).head
 

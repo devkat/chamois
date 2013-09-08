@@ -14,9 +14,15 @@
 @beige: #F5F5DC;
 @maroon: #800000;
 
-@col-bg: #BFAC9B;
+@col-1: #A69C80;
+@col-2: #BFB595;
+@col-3: #590302;
+@col-4: #260101;
+@col-5: #670100;
+
+@col-bg: #590302;
 @col-warn: #DD4225;
-@col-fg: #260612;
+@col-fg: #BFB595;
 
 body {
 }
@@ -100,6 +106,7 @@ body {
 
 .drawer-container {
   height: 100%;
+  
   .translate3d(0, -128px, 0);
   //.transition(transform 1s linear);
   
@@ -110,23 +117,23 @@ body {
   
   &.in {
     .translate3d(0, 0, 0);
-    .drawer-trigger { opacity: 1; }
   }
 }
 
 .drawer {
   height: 128px;
   background-color: @col-bg;
+  color: @col-fg;
 }
 
 .drawer-trigger {
+  background-color: @col-bg;
+  color: @col-fg;
   position: absolute;
   width: 100%;
   &.collapsed {
   }
   opacity: 0;
-  background-color: @col-bg;
-  color: @col-fg;
   text-align: center;
   .transition(opacity .5s linear);
   &:hover {

@@ -4,8 +4,7 @@ require([
   './gui/tree',
   'bootstrap',
   //'fuelux',
-  './gui',
-  './mercury-editor'
+  './gui'
 ], function(
   $,
   _,

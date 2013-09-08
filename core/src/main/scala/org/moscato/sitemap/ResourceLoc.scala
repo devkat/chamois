@@ -34,15 +34,16 @@ object ResourceLoc extends Loc[Resource] {
     }}
   }
   
-  lazy val representations = Map(
-    Raw.name -> Raw,
-    View.name -> View,
-    Mercury.name -> Mercury
-  )
+  lazy val representations = {
+    Map(
+      Raw.name -> Raw,
+      View.name -> View
+    )
+  } ++ Representation.reps
   
   override def template: Box[scala.xml.Node] = htmlVersion flatMap { v =>
     Html5.parse(new ByteArrayInputStream(v.content.get)) map { html =>
-      representations(S.param("moscato-rep")).template(html).head
+      representations(S.param("moscato-rep").openOr("")).template(html).head
     }
   }
   

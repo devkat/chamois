@@ -9,9 +9,9 @@ object BuildSettings {
 
   val buildSettings = Defaults.defaultSettings ++ Seq (
     scalacOptions += "-deprecation",
-    crossScalaVersions := Seq("2.8.1", "2.9.0", "2.9.0-1", "2.9.1", "2.9.2"),
+    crossScalaVersions := Seq("2.9.2"),
     resolvers ++= Seq(
-      ScalaToolsReleases,
+      //ScalaToolsReleases,
       "BeCompany Nexus" at "http://nexus.becompany.ch/nexus/content/groups/public/",
       "Local Maven Repository" at "file://" + Path.userHome.absolutePath + "/.m2/repository",
       "Shiro Releases" at "https://repository.apache.org/content/repositories/releases/",
@@ -72,26 +72,34 @@ object MoscatoBuild extends Build {
   )
 
   lazy val repo = Project("moscato-repo", file("repo")) settings(repoSettings:_*)
+  
+  lazy val coreSettings = Seq(
+    libraryDependencies ++= Seq(
+      "net.liftweb" %% "lift-webkit" % liftVersion,
+      "net.devkat" %% "lift-bootstrap" % "1.0-SNAPSHOT",
+      "org.clapper" %% "classutil" % "1.0.2"
+    )
+  )
 
+  lazy val core = Project("moscato-core", file("core")) dependsOn(repo) settings(coreSettings:_*)
+  
   lazy val webappSettings = webSettings ++ Seq(
-      libraryDependencies ++= Seq(
-        "net.liftweb" %% "lift-webkit" % liftVersion,
-        //"net.liftmodules" %% "lift-openid" % liftVersion % "compile->default",
-        "net.liftmodules" %% "openid" % "2.5-RC4-1.2" excludeAll(ExclusionRule(organization = "net.liftweb")),
-        "net.devkat" %% "lift-bootstrap" % "1.0-SNAPSHOT",
-        "net.databinder.dispatch" %% "dispatch-core" % "0.9.4",
-        "se.fishtank" %% "css-selectors-scala" % "0.1.2",
-        "commons-collections" % "commons-collections" % "3.2.1",
-        //"commons-beanutils" % "commons-beanutils" % "20030211.134440",
-        "org.eclipse.jetty" % "jetty-webapp" % "8.1.11.v20130520" % "container,test",
-        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container,compile" artifacts Artifact("javax.servlet", "jar", "jar")
-      ),
+    libraryDependencies ++= Seq(
+      //"net.liftmodules" %% "lift-openid" % liftVersion % "compile->default",
+      "net.liftmodules" %% "openid" % "2.5-RC4-1.2" excludeAll(ExclusionRule(organization = "net.liftweb")),
+      //"net.databinder.dispatch" %% "dispatch-core" % "0.9.4",
+      "se.fishtank" %% "css-selectors-scala" % "0.1.2",
+      "commons-collections" % "commons-collections" % "3.2.1",
+      //"commons-beanutils" % "commons-beanutils" % "20030211.134440",
+      "org.eclipse.jetty" % "jetty-webapp" % "8.1.11.v20130520" % "container,test",
+      "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container,compile" artifacts Artifact("javax.servlet", "jar", "jar")
+    ),
     (webappResources in Compile) <+= (resourceManaged in Compile)(_ / "webapp")
   )
 
-  lazy val web = Project("moscato-web", file("web")) dependsOn(repo) settings(webappSettings:_*)
+  lazy val web = Project("moscato-web", file("web")) dependsOn(repo, core) settings(webappSettings:_*)
   
-  lazy val root = Project("moscato", file(".")) aggregate(repo, web) settings(rootSettings:_*)
+  lazy val root = Project("moscato", file(".")) aggregate(repo, core, web) settings(rootSettings:_*)
   
-  override def projects = Seq(root, repo, web)
+  override def projects = Seq(root, repo, core, web)
 }
