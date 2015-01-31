@@ -3,7 +3,7 @@
   "version": "1.0-SNAPSHOT",
   "description": "moscato web application",
   "dependencies": {
-    "bootstrap": "3.0.0",
+    "bootstrap": "3.3.2",
     "bootstrap-growl": "1.1.0",
     "font-awesome": "3.2.1",
     "jquery": "1.9.1",

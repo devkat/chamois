@@ -1,0 +1,30 @@
+<div>
+  <wizard:wizard_top> <div> <wizard:bind/> </div> </wizard:wizard_top> 
+  <wizard:screen_top> <legend> <wizard:bind/> </legend> </wizard:screen_top> 
+  <wizard:errors>
+    <ul>
+      <wizard:item>
+        <li><wizard:bind/></li>
+      </wizard:item>
+    </ul>
+  </wizard:errors>
+  <div lift:bind="wizard:fields">
+    <div class="form-group" lift:bind="wizard:line">
+      <wizard:label>
+        <label wizard:for=""><wizard:bind></wizard:bind></label>
+      </wizard:label>
+      <wizard:help><span><wizard:bind></wizard:bind></span></wizard:help>
+      <wizard:form class="form-control"></wizard:form>
+      <wizard:field_errors>
+        <wizard:error><span class="help-inline"><wizard:bind/></span></wizard:error>
+      </wizard:field_errors>
+    </div>
+  </div> 
+  <div class="form-group">
+     <wizard:prev></wizard:prev> 
+     <wizard:cancel></wizard:cancel> 
+     <wizard:next></wizard:next> 
+  </div>
+  <wizard:screen_bottom><div><wizard:bind></wizard:bind></div></wizard:screen_bottom> 
+  <wizard:wizard_bottom><div><wizard:bind></wizard:bind></div></wizard:wizard_bottom> 
+</div>
