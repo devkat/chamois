@@ -1,4 +1,4 @@
-package org.arriba.util;
+package org.moscatocms.util;
 
 import java.io.File;
 import java.io.IOException;

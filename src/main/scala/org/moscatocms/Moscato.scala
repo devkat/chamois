@@ -1,13 +1,11 @@
 package org.moscatocms
 
-import org.moscatocms.rest.ResourcesRest
 import net.liftweb.http.LiftRules
 import net.liftweb.http.Req
 import net.liftweb.http.Html5Properties
 import net.liftweb.common.Full
 import net.liftweb.sitemap.SiteMap
 import net.liftweb.sitemap.Menu
-import org.moscatocms.sitemap.ResourceLoc
 import net.liftweb.http.LiftSession
 import net.liftweb.util.Vendor
 
@@ -19,10 +17,6 @@ object Moscato {
     LiftRules.dispatch.append(MoscatoOpenIdVendor.dispatchPF)
     LiftRules.snippets.append(MoscatoOpenIdVendor.snippetPF)
      */
-    
-    List(ResourcesRest) foreach {
-      LiftRules.statelessDispatch.append(_)
-    }
     
     LiftRules.addToPackages("org.moscatocms")
 
@@ -56,8 +50,7 @@ object Moscato {
       Menu.i("Edit resource") / "moscato" / "edit",
       Menu.i("Edit with Mercury") / "moscato" / "mercury",
       Menu.i("Import") / "moscato" / "import",
-      Menu.i("Drawer") / "moscato" / "drawer",
-      Menu(ResourceLoc) // >> RequireAuthentication
+      Menu.i("Drawer") / "moscato" / "drawer"
     )
   
 }

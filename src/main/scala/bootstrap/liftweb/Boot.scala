@@ -8,20 +8,14 @@ import net.liftweb.sitemap._
 import net.liftweb.sitemap.Loc._
 import Helpers._
 import java.sql.{ Connection, DriverManager }
-import org.moscatocms.repo._
 import shiro.Shiro
 import shiro.sitemap.Locs._
-import net.liftweb.squerylrecord.RecordTypeMode._
-import net.liftweb.squerylrecord.SquerylRecord
-import org.squeryl.Session
-import org.squeryl.adapters.PostgreSqlAdapter
 import java.util.Locale
 import org.moscatocms.auth.MoscatoOpenIdVendor
-import org.moscatocms.sitemap._
 import net.liftweb.sitemap.Menu.Menuable
 import net.liftweb.sitemap.Loc.MenuCssClass
-import org.moscatocms.rest._
 import org.moscatocms.Moscato
+import org.moscatocms.slick.Slick
 
 /**
  * A class that's instantiated early and run.  It allows the application
@@ -36,10 +30,7 @@ class Boot {
       user <- Props.get("db.user")
       password <- Props.get("db.password")
     } {
-      SquerylRecord.initWithSquerylSession(Session.create(
-        DriverManager.getConnection(url, user, password),
-        new PostgreSqlAdapter))
-      S.addAround(SquerylRecord.buildLoanWrapper)
+      Slick.init(url, user, password)
     }
     
     LiftRules.localeCalculator = (_) => Locale.ENGLISH

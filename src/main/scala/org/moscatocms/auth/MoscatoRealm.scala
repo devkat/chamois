@@ -8,20 +8,22 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo
 import org.apache.shiro.realm.AuthorizingRealm
 import org.apache.shiro.subject.PrincipalCollection
 import org.apache.shiro.util.ByteSource
-import org.moscatocms.repo._
+import org.moscatocms.slick.Slick._
+import org.moscatocms.model.Tables._
+import slick.driver.PostgresDriver.simple._
 
 class MoscatoRealm extends AuthorizingRealm {
   
-  import MoscatoDb._
-
   def doGetAuthenticationInfo(token:AuthenticationToken) = {
     val userToken = token.asInstanceOf[UsernamePasswordToken]
-    User.findByUsername(userToken.getUsername()) match {
+    val query = Users.filter(_.email === userToken.getUsername)
+    
+    db.run(query.firstOption) match {
       case Some(user) => {
         val info = new SimpleAuthenticationInfo(
             user.id,
-            user.passwordHash.is.get,
-            ByteSource.Util.bytes(user.passwordSalt.is.get),
+            user.passwordHash.get.get,
+            ByteSource.Util.bytes(user.passwordSalt.get.get),
             getName())
         info
       }
