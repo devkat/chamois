@@ -1,9 +1,0 @@
-h1. Chamois 
-
-Run sbt:
-
-bc. sbt
-
-Start the web container:
-
-bc. ~;container:start; container:reload /
