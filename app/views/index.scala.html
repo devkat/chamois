@@ -1,0 +1,16 @@
+@(User: Form[CreateUserForm])(implicit messages: Messages)
+
+@import helper._
+@import b3.vertical.fieldConstructor
+
+@main("Welcome to Play") {
+  <script type='text/javascript' src='@routes.Assets.versioned("javascripts/index.js")'></script>
+
+  <ul id="Users"></ul>
+
+  @b3.form(routes.UserController.addUser()) {
+    @b3.email(User("email"), '_label -> "E-mail")
+    @b3.password(User("password"), '_label -> "Password", 'placeholder -> "Password" )
+    @b3.submit('class -> "btn btn-default"){ Add User }
+  }
+}
