@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+  <changeSet id="insert-users" author="devkat">
+  
+    <!-- 
+    java \
+    -jar lib/shiro-tools-hasher-1.2.3-cli.jar -d -p \
+        - -algorithm SHA-512 \
+        - -format shiro1 \
+        - -iterations 1024 \
+        - -gensalt \
+        - -gensaltsize 256
+     -->
+  
+    <insert tableName="user">
+      <column name="username" value="admin"/>
+      <column name="email" value="admin@moscatocms.org"/>
+      <column name="salt" value="EdcvbiKpi9hqIGSEot4OYW23rB+Ez1GVZA1jAfWu9lU="/>
+      <column name="password" value="/7XbVVFYn5JOjpPO7rQO+9UOGOxSHHHssNp3VehF3LiGbg/cKlfLQiJGr/oiWR+PtD5U5Cg35QTmC3QBb/DZXw=="/>
+    </insert>
+
+  </changeSet>
+
+</databaseChangeLog>
