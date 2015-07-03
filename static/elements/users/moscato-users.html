@@ -1,0 +1,51 @@
+<dom-module id="moscato-users">
+  <template>
+
+    <header>
+      <paper-toolbar>
+        <paper-button on-click="addUserAction">Create</paper-button>
+      </paper-toolbar>
+    </header>
+
+    <section id="main" hidden$="[[model.users.length === 0]]">
+    <div>{{model.users.length}}</div>
+      <ul id="users-list">
+        <template  is="dom-repeat" items="{{model.users}}">
+          <li>{{item.email}}</li>
+        </template>
+      </ul>
+    </section>
+    <!--
+    <footer hidden$="{{model.users.length == 0}}">
+      <span>[[model.users.length]] [[model.users.length == 1 ? 'user' : 'users']]</span>
+    </footer>
+      -->
+
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        
+        attached: function() {
+          this.async(function() {
+            this.model = document.querySelector('moscato-users-model');
+          });
+        },
+        
+        addUserAction: function() {
+          page.redirect('/users/add');
+        },
+        
+        userChangedAction: function() {
+          if (this.model) {
+            this.model.usersChanged();
+          }
+        },
+        
+        deleteUserAction: function(e, detail) {
+          this.model.deleteUser(detail);
+        }
+      });
+    })();
+  </script>
+</dom-module>

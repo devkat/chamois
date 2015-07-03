@@ -1,0 +1,54 @@
+<dom-module id="moscato-users-add">
+  <style>
+    form {
+      @apply(--layout-vertical);
+    }
+    .buttons {
+      margin-top: 1em;
+      @apply(--layout-horizontal);
+    }
+  </style>
+  <template>
+    <section id="moscato-users-add" data-route="users-add">
+      <h2>Add user</h2>
+      <form is="iron-form">
+        <paper-input-container>
+          <label>E-mail</label>
+          <input is="iron-input" id="email" value="{{email}}" type="email" required>
+          <paper-input-error>Invalid e-mail address</paper-input-error>
+        </paper-input-container>
+        <div class="buttons">
+          <paper-button raised on-click="addUserAction">Add</paper-button></paper-button>
+        </div>
+      </form>
+    </section>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        
+        attached: function() {
+          this.async(function() {
+            this.model = document.querySelector('moscato-users-model');
+            console.log(this.model);
+          });
+        },
+        
+        addUserAction: function() {
+          var result = this.$.email.validate();
+          console.log(result);
+          this.model.addUser(this.$.email.value);
+          // when polyfilling Object.observe, make sure we update immediately
+          Polymer.dom.flush();
+          this.$.email.value = '';
+          page.redirect('/users');
+        },
+        
+        cancelAddUserAction: function() {
+          this.$.email.value = '';
+        }
+        
+      });
+    })();
+  </script>
+</dom-module>

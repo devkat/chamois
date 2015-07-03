@@ -1,0 +1,38 @@
+<dom-module id="moscato-users-model">
+  <script>
+    Polymer({
+      properties: {
+        users: {
+          type: Array,
+          notify: true
+        }
+      },
+
+      attached: function() {
+        this.async(function() {
+          this.users = [];
+          // load users
+        });
+      },
+
+      observers: [
+        'usersAddedOrRemoved(users.splices)'
+      ],
+
+      usersAddedOrRemoved: function(changeRecord) {
+        if (changeRecord) {
+          changeRecord.indexSplices.forEach(function(s) {
+            s.removed.forEach(function(user) {
+              console.log(user.name + ' was removed');
+            });
+            console.log(s.addedCount + ' users were added');
+          }, this);
+        }
+      },
+
+      addUser: function(email) {
+        this.push('users', { email: email });
+      }
+   });
+  </script>
+</dom-module>
