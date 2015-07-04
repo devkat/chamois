@@ -106,9 +106,10 @@
             <section data-route="home">
               Home
             </section>
-
+<!--
             <moscato-users-model></moscato-users-model>
-            <moscato-users data-route="users"></moscato-users>
+              -->
+            <moscato-users foo="bar" data-route="users"></moscato-users>
             <moscato-users-add data-route="users-add"></moscato-users-add>
             
             <section data-route="contact">
@@ -139,9 +140,16 @@
   -->
   </template>
 
+  <script src="static/bower_components/underscore/underscore-min.js"></script>
+  <script src="static/bower_components/q/q.js"></script>
+  <script src="static/bower_components/eventEmitter/EventEmitter.min.js"></script>
+  <script src="static/bower_components/amygdala/amygdala.js"></script>
+  
   <!-- build:js scripts/app.js -->
   <script src="static/scripts/app.js"></script>
   <!-- endbuild-->
+
+  <script src="static/scripts/rest.js"></script>
 </body>
 
 </html>

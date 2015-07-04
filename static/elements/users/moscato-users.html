@@ -7,39 +7,41 @@
       </paper-toolbar>
     </header>
 
-    <section id="main" hidden$="[[model.users.length === 0]]">
-    <div>{{model.users.length}}</div>
+    <section id="main" hidden$="[[users.length === 0]]">
       <ul id="users-list">
-        <template  is="dom-repeat" items="{{model.users}}">
+        <template  is="dom-repeat" items="{{users}}">
           <li>{{item.email}}</li>
         </template>
       </ul>
     </section>
-    <!--
-    <footer hidden$="{{model.users.length == 0}}">
-      <span>[[model.users.length]] [[model.users.length == 1 ? 'user' : 'users']]</span>
+
+    <footer hidden$="[[users.length === 0]]">
+      <span>[[users.length]]</span> <span>[[users.length === 1 ? 'user' : 'users']]</span>
     </footer>
-      -->
 
   </template>
   <script>
     (function() {
       Polymer({
         
+        properties: {
+          users: {
+            type: Array,
+            value: [],
+            notify: true
+          },
+          foo: String
+        },
+
         attached: function() {
-          this.async(function() {
-            this.model = document.querySelector('moscato-users-model');
+          var that = this;
+          restStore.get('users').done(function() {
+            that.set('users', restStore.findAll('users'));
           });
         },
-        
+
         addUserAction: function() {
           page.redirect('/users/add');
-        },
-        
-        userChangedAction: function() {
-          if (this.model) {
-            this.model.usersChanged();
-          }
         },
         
         deleteUserAction: function(e, detail) {

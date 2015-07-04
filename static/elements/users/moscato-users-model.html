@@ -4,15 +4,11 @@
       properties: {
         users: {
           type: Array,
+          value: function() {
+            return [{email: 'nobby@macbay.de'}];
+          },
           notify: true
         }
-      },
-
-      attached: function() {
-        this.async(function() {
-          this.users = [];
-          // load users
-        });
       },
 
       observers: [
