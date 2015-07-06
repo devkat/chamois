@@ -15,7 +15,8 @@ object MoscatoJsonProtocol extends DefaultJsonProtocol {
     }
   }
   
-  implicit val UserFormat = jsonFormat2(UserData)
+  implicit val UserDataFormat = jsonFormat2(UserData)
+  implicit val UserDataWithIdFormat = jsonFormat3(UserDataWithId)
   
   /*
   implicit object UserFormat extends RootJsonFormat[UserData] {

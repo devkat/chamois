@@ -1,22 +1,35 @@
 <dom-module id="moscato-users">
+  <style>
+    .list {
+      @apply(--layout-vertical);
+    }
+    .username {
+      @apply(--layout-flex);
+    }
+  </style>
+
   <template>
 
     <header>
+      <h2>Users</h2>
       <paper-toolbar>
-        <paper-button on-click="addUserAction">Create</paper-button>
+        <paper-button on-click="addUserAction">Add</paper-button>
       </paper-toolbar>
     </header>
 
     <section id="main" hidden$="[[users.length === 0]]">
-      <ul id="users-list">
+      <div class="list short">
         <template  is="dom-repeat" items="{{users}}">
-          <li>{{item.email}}</li>
+          <paper-icon-item on-click="editUserAction">
+            <iron-icon icon="social:person" item-icon></iron-icon>
+            <span>{{item.username}}</span>
+          </paper-icon-item>
         </template>
-      </ul>
+      </div>
     </section>
 
     <footer hidden$="[[users.length === 0]]">
-      <span>[[users.length]]</span> <span>[[users.length === 1 ? 'user' : 'users']]</span>
+      <span>[[users.length]]</span> user(s)
     </footer>
 
   </template>
@@ -35,13 +48,23 @@
 
         attached: function() {
           var that = this;
-          restStore.get('users').done(function() {
+          restStore.get('users').done(function(users) {
+            that.set('users', users);
+          });
+          restStore.on('change:users', function() {
             that.set('users', restStore.findAll('users'));
           });
         },
 
         addUserAction: function() {
-          page.redirect('/users/add');
+          page('/users/add');
+        },
+        
+        editUserAction: function(e) {
+          var username = e.model.item.username;
+          var user = restStore.find('users', { username: username });
+          document.querySelector('#moscato-user-edit').setUser(user);
+          page('/users/edit');
         },
         
         deleteUserAction: function(e, detail) {

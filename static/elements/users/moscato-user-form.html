@@ -1,0 +1,75 @@
+<dom-module id="moscato-user-form">
+  <style>
+    form {
+      @apply(--layout-vertical);
+    }
+    .buttons {
+      margin-top: 1em;
+      @apply(--layout-horizontal);
+    }
+  </style>
+  <template>
+    <section id="moscato-users-edit">
+      <h2><span>[[title]]</span></h2>
+      <form is="iron-form">
+        <paper-input-container always-float-label>
+          <label>Username</label>
+          <input is="iron-input" id="username" value="{{user.username::input}}" type="text" required>
+        </paper-input-container>
+        <paper-input-container always-float-label>
+          <label>E-mail</label>
+          <input is="iron-input" id="email" value="{{user.email::input}}" type="email" required>
+          <paper-input-error>Invalid e-mail address</paper-input-error>
+        </paper-input-container>
+        <div class="buttons">
+          <paper-button on-click="cancelAction">Cancel</paper-button>
+          <paper-button raised on-click="saveAction">[[submitLabel]]</paper-button></paper-button>
+        </div>
+      </form>
+    </section>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        
+        properties: {
+          mode: String,
+          title: String,
+          submitLabel: String,
+          user: {
+            type: Object,
+            value: {}
+          }
+        },
+        
+        reset: function() {
+          this.user = {};
+        },
+
+        saveAction: function() {
+          var valid = this.$.email.validate();
+          var that = this;
+          function done() {
+            // when polyfilling Object.observe, make sure we update immediately
+            Polymer.dom.flush();
+            that.reset();
+            page.redirect('/users');
+          }
+          if (valid) {
+            restStore[this.mode === 'add' ? 'add' : 'update']('users', this.user).done(done);
+          }
+        },
+        
+        cancelAction: function() {
+          this.reset();
+          page.redirect('/users');
+        },
+        
+        setUser: function(user) {
+          this.set('user', _.clone(user));
+        }
+        
+      });
+    })();
+  </script>
+</dom-module>

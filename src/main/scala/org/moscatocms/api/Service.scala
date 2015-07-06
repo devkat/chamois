@@ -16,7 +16,8 @@ trait Service extends HttpService {
   
   import MoscatoJsonProtocol._
   
-  def toUserData(user: UserRow) = UserData(user.username, user.email)
+  def toUserDataWithId(user: UserRow) =
+    UserDataWithId(user.id, user.username, user.email)
  
   val route = {
     pathPrefix("cms") {
@@ -27,11 +28,21 @@ trait Service extends HttpService {
         pathPrefix("v1") {
           pathPrefix("users") {
             get {
-              complete(Users.list.map(_.map(toUserData _)))
+              complete(Users.list.map(_.map(toUserDataWithId _)))
             } ~
             post {
               entity(as[UserData]) { user =>
-                complete(Users.add(user).map(toUserData _))
+                complete(Users.add(user).map(toUserDataWithId _))
+              }
+            } ~
+            path(LongNumber) { userId =>
+              put {
+                entity(as[UserData]) { user =>
+                  complete {
+                    Users.update(userId, user)
+                    Users.find(userId).map(toUserDataWithId _)
+                  }
+                }
               }
             }
           }
