@@ -12,11 +12,11 @@
     <section id="moscato-users-edit">
       <h2><span>[[title]]</span></h2>
       <form is="iron-form">
-        <paper-input-container always-float-label>
+        <paper-input-container>
           <label>Username</label>
           <input is="iron-input" id="username" value="{{user.username::input}}" type="text" required>
         </paper-input-container>
-        <paper-input-container always-float-label>
+        <paper-input-container>
           <label>E-mail</label>
           <input is="iron-input" id="email" value="{{user.email::input}}" type="email" required>
           <paper-input-error>Invalid e-mail address</paper-input-error>
@@ -45,28 +45,23 @@
         reset: function() {
           this.user = {};
         },
-
-        saveAction: function() {
-          var valid = this.$.email.validate();
-          var that = this;
-          function done() {
-            // when polyfilling Object.observe, make sure we update immediately
-            Polymer.dom.flush();
-            that.reset();
-            page.redirect('/users');
-          }
-          if (valid) {
-            restStore[this.mode === 'add' ? 'add' : 'update']('users', this.user).done(done);
-          }
-        },
         
         cancelAction: function() {
           this.reset();
-          page.redirect('/users');
+          this.fire('cancel');
         },
         
         setUser: function(user) {
           this.set('user', _.clone(user));
+        },
+        
+        saveAction: function() {
+          var valid = this.$.email.validate();
+          if (valid) {
+            Polymer.dom.flush();
+            this.fire('save', { user: this.user });
+            this.reset();
+          }
         }
         
       });

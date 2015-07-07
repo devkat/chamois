@@ -1,0 +1,51 @@
+<dom-module id="moscato-user-list">
+  <style>
+    .list {
+      @apply(--layout-vertical);
+    }
+    .username {
+      @apply(--layout-flex);
+    }
+  </style>
+
+  <template>
+    <section id="main" hidden$="[[users.length === 0]]">
+      <div class="list short">
+        <template is="dom-repeat" items="{{users}}">
+          <paper-icon-item on-click="selectUserAction">
+            <iron-icon icon="social:person" item-icon></iron-icon>
+            <span>{{item.username}}</span>
+          </paper-icon-item>
+        </template>
+      </div>
+    </section>
+
+    <footer hidden$="[[users.length === 0]]">
+      <span>[[users.length]]</span> user(s)
+    </footer>
+  </template>
+  <script>
+    (function() {
+      Polymer({
+        
+        properties: {
+          users: {
+            type: Array,
+            value: []
+          }
+        },
+
+        selectUserAction: function(e) {
+          var username = e.model.item.username;
+          var user = restStore.find('users', { username: username });
+          this.fire('select', { user: user });
+        },
+        
+        deleteUserAction: function(e, detail) {
+          this.model.deleteUser(detail);
+        }
+      });
+    })();
+  </script>
+</dom-module>
+    

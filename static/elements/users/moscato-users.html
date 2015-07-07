@@ -1,3 +1,6 @@
+<link rel="import" href="moscato-user-list.html">
+<link rel="import" href="moscato-user-form.html">
+
 <dom-module id="moscato-users">
   <style>
     .list {
@@ -16,57 +19,61 @@
         <paper-button on-click="addUserAction">Add</paper-button>
       </paper-toolbar>
     </header>
-
-    <section id="main" hidden$="[[users.length === 0]]">
-      <div class="list short">
-        <template  is="dom-repeat" items="{{users}}">
-          <paper-icon-item on-click="editUserAction">
-            <iron-icon icon="social:person" item-icon></iron-icon>
-            <span>{{item.username}}</span>
-          </paper-icon-item>
-        </template>
-      </div>
-    </section>
-
-    <footer hidden$="[[users.length === 0]]">
-      <span>[[users.length]]</span> user(s)
-    </footer>
+    
+    <iron-pages id="pages" attr-for-selected="id" selected="userList">
+    
+      <moscato-user-list id="userList" on-select="editUserAction"></moscato-user-list>
+      
+      <moscato-user-form id="addUserForm" data-route="users-add" title="Add user" submit-label="Add"
+        on-save="userAdded" on-cancel="cancelUserAction"></moscato-user-form>
+      
+      <moscato-user-form id="editUserForm" data-route="users-edit" title="Edit user" submit-label="Save"
+        on-save="userUpdated" on-cancel="cancelUserAction"></moscato-user-form>
+    
+    </iron-pages>
 
   </template>
   <script>
     (function() {
       Polymer({
         
-        properties: {
-          users: {
-            type: Array,
-            value: [],
-            notify: true
-          },
-          foo: String
-        },
-
         attached: function() {
           var that = this;
           restStore.get('users').done(function(users) {
-            that.set('users', users);
+            that.$.userList.set('users', users);
           });
           restStore.on('change:users', function() {
-            that.set('users', restStore.findAll('users'));
+            that.$.userList.set('users', restStore.findAll('users'));
           });
         },
-
+        
         addUserAction: function() {
-          page('/users/add');
+          this.$.pages.selected = 'addUserForm';
+        },
+
+        userAdded: function(e, detail) {
+          var that = this;
+          restStore.add('users', detail.user).done(function() {
+            that.$.pages.selected = 'userList';
+          });
         },
         
-        editUserAction: function(e) {
-          var username = e.model.item.username;
-          var user = restStore.find('users', { username: username });
-          document.querySelector('#moscato-user-edit').setUser(user);
-          page('/users/edit');
+        editUserAction: function(e, detail) {
+          this.$.editUserForm.setUser(detail.user);
+          this.$.pages.selected = 'editUserForm';
         },
         
+        userUpdated: function(e, detail) {
+          var that = this;
+          restStore.update('users', detail.user).done(function() {
+            that.$.pages.selected = 'userList';
+          });
+        },
+        
+        cancelUserAction: function() {
+          this.$.pages.selected = 'userList';
+        },
+
         deleteUserAction: function(e, detail) {
           this.model.deleteUser(detail);
         }

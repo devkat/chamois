@@ -39,8 +39,8 @@ trait Service extends HttpService {
               put {
                 entity(as[UserData]) { user =>
                   complete {
-                    Users.update(userId, user)
-                    Users.find(userId).map(toUserDataWithId _)
+                    Users.update(userId, user).
+                      map(userId => Users.find(userId).map(toUserDataWithId _))
                   }
                 }
               }

@@ -4,31 +4,13 @@
       properties: {
         users: {
           type: Array,
-          value: function() {
-            return [{email: 'nobby@macbay.de'}];
-          },
           notify: true
-        }
-      },
-
-      observers: [
-        'usersAddedOrRemoved(users.splices)'
-      ],
-
-      usersAddedOrRemoved: function(changeRecord) {
-        if (changeRecord) {
-          changeRecord.indexSplices.forEach(function(s) {
-            s.removed.forEach(function(user) {
-              console.log(user.name + ' was removed');
-            });
-            console.log(s.addedCount + ' users were added');
-          }, this);
         }
       },
 
       addUser: function(email) {
         this.push('users', { email: email });
       }
-   });
+    });
   </script>
 </dom-module>
