@@ -10,28 +10,26 @@ scalaVersion := "2.11.7"
 
 scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
  
-scalacOptions := Seq("-unchecked", "-deprecation", "-encoding", "utf8")
- 
 libraryDependencies ++= {
   val akkaVersion = "2.3.9"
   val sprayVersion = "1.3.3"
   val slickVersion = "3.0.0"
   Seq(
-   "io.spray" %% "spray-can" % sprayVersion withSources() withJavadoc(),
-   "io.spray" %% "spray-routing" % sprayVersion withSources() withJavadoc(),
-   "io.spray" %% "spray-json" % "1.3.2",
-   "io.spray" %% "spray-client" % sprayVersion,
-   "io.spray" %% "spray-testkit" % sprayVersion % "test",
-   "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-   "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-   "com.typesafe.slick" %% "slick" % slickVersion,
-   "com.typesafe.slick" %% "slick-codegen" % slickVersion,
-   "org.apache.shiro" % "shiro-core" % "1.2.3",
-   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
-   "org.liquibase" % "liquibase-core" % "3.4.0",
-   "org.specs2" %% "specs2-core" % "2.3.11" % "test",
-   "org.scalaz" %% "scalaz-core" % "7.1.0",
-   "org.reflections" % "reflections" % "0.9.10",
+    "io.spray" %% "spray-can" % sprayVersion withSources() withJavadoc(),
+    "io.spray" %% "spray-routing" % sprayVersion withSources() withJavadoc(),
+    "io.spray" %% "spray-json" % "1.3.2",
+    "io.spray" %% "spray-client" % sprayVersion,
+    "io.spray" %% "spray-testkit" % sprayVersion % "test",
+    "com.typesafe.akka" %% "akka-actor" % akkaVersion,
+    "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
+    "com.typesafe.slick" %% "slick" % slickVersion,
+    "com.typesafe.slick" %% "slick-codegen" % slickVersion,
+    "org.apache.shiro" % "shiro-core" % "1.2.3",
+    "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
+    "org.liquibase" % "liquibase-core" % "3.4.0",
+    "org.specs2" %% "specs2-core" % "2.3.11" % "test",
+    "org.scalaz" %% "scalaz-core" % "7.1.0",
+    "org.reflections" % "reflections" % "0.9.10",
     "org.scala-lang" % "scala-reflect" % scalaVersion.value
   )
 }
