@@ -28,8 +28,11 @@ libraryDependencies ++= {
    "com.typesafe.slick" %% "slick-codegen" % slickVersion,
    "org.apache.shiro" % "shiro-core" % "1.2.3",
    "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
+   "org.liquibase" % "liquibase-core" % "3.4.0",
    "org.specs2" %% "specs2-core" % "2.3.11" % "test",
-   "org.scalaz" %% "scalaz-core" % "7.1.0"
+   "org.scalaz" %% "scalaz-core" % "7.1.0",
+   "org.reflections" % "reflections" % "0.9.10",
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value
   )
 }
 
@@ -50,6 +53,8 @@ liquibasePassword := "moscato"
 liquibaseDriver := "org.postgresql.Driver"
 
 liquibaseUrl := "jdbc:postgresql:moscato"
+
+liquibaseChangelog := file("src/main/resources/org/moscatocms/migrations/moscato-changelog.xml")
 
 // ----------------------------------------------------------------------
 // Slick

@@ -5,9 +5,8 @@ import spray._
 import routing._
 import http.{StatusCodes, HttpResponse}
 import akka.util.Timeout
-import scala.concurrent.ExecutionContext
 
-class Api extends Actor with RouteConcatenation with Service {
+class Api extends Actor with Service {
   
   // required as implicit value for the HttpService
   // included from SJService

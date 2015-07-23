@@ -19,10 +19,10 @@ trait Service extends HttpService {
   def toUserDataWithId(user: UserRow) =
     UserDataWithId(user.id, user.username, user.email)
  
-  val route = {
+  lazy val route = {
     pathPrefix("cms") {
       path("") {
-        getFromFile("static/index.html")
+        getFromResource("org/moscatocms/static/index.html")
       } ~
       pathPrefix("api") {
         pathPrefix("v1") {
@@ -45,7 +45,7 @@ trait Service extends HttpService {
                 }
               }
             }
-          }
+          } ~ Routes()
         }
       } ~
       path("secured") {
@@ -54,7 +54,7 @@ trait Service extends HttpService {
         }
       } ~
       pathPrefix("static") {
-        getFromDirectory("static")
+        getFromResourceDirectory("org/moscatocms/static")
       }
     }
   }

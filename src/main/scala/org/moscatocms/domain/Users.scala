@@ -4,7 +4,6 @@ import slick.driver.PostgresDriver.api._
 import org.moscatocms.db.Db._
 import org.moscatocms.model.Tables._
 import org.moscatocms.api.UserData
-import scala.concurrent.ExecutionContext
 
 object Users {
   
