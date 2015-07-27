@@ -15,6 +15,7 @@ libraryDependencies ++= {
   val sprayVersion = "1.3.3"
   val slickVersion = "3.0.0"
   Seq(
+    "org.moscatocms" %% "moscato-doctype" % version.value,
     "io.spray" %% "spray-can" % sprayVersion withSources() withJavadoc(),
     "io.spray" %% "spray-routing" % sprayVersion withSources() withJavadoc(),
     "io.spray" %% "spray-json" % "1.3.2",
@@ -98,5 +99,5 @@ EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed
 // Project
 // ----------------------------------------------------------------------
 
-lazy val root = (project in file(".")).enablePlugins(SbtLiquibase, SbtBower)
+lazy val root = (project in file(".")).enablePlugins(SbtLiquibase, SbtBower, SbtTwirl)
 

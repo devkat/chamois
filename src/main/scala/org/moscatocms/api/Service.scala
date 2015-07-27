@@ -5,6 +5,7 @@ import spray.routing._
 import spray.http._
 import MediaTypes._
 import spray.httpx.SprayJsonSupport._
+import spray.httpx.PlayTwirlSupport._
 import spray.routing.authentication.BasicAuth
 import org.moscatocms.security.Authentication._
 import spray.routing.directives.FileAndResourceDirectives._
@@ -15,6 +16,7 @@ import org.moscatocms.model.Tables.UserRow
 trait Service extends HttpService {
   
   import MoscatoJsonProtocol._
+  import Doctypes._
   
   def toUserDataWithId(user: UserRow) =
     UserDataWithId(user.id, user.username, user.email)
@@ -22,7 +24,10 @@ trait Service extends HttpService {
   lazy val route = {
     pathPrefix("cms") {
       path("") {
-        getFromResource("org/moscatocms/static/index.html")
+        respondWithMediaType(`text/html`) {
+          complete(org.moscatocms.html.index(doctypes).toString)
+        }
+        //getFromResource("org/moscatocms/static/index.html")
       } ~
       pathPrefix("api") {
         pathPrefix("v1") {
