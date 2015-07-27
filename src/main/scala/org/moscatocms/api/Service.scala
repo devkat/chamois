@@ -45,7 +45,7 @@ trait Service extends HttpService {
                 }
               }
             }
-          } ~ Routes()
+          } ~: Routes
         }
       } ~
       path("secured") {

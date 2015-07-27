@@ -30,7 +30,9 @@ libraryDependencies ++= {
     "org.specs2" %% "specs2-core" % "2.3.11" % "test",
     "org.scalaz" %% "scalaz-core" % "7.1.0",
     "org.reflections" % "reflections" % "0.9.10",
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
+    "ch.qos.logback" % "logback-classic" % "1.1.3"
   )
 }
 
@@ -39,6 +41,16 @@ libraryDependencies ++= {
 // ----------------------------------------------------------------------
 
 Revolver.settings
+
+// ----------------------------------------------------------------------
+// sbt-bower
+// ----------------------------------------------------------------------
+
+JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
+
+target in bower := (resourceManaged in Compile).value / "org" / "moscatocms" / "static" / "bower_components"
+
+resourceGenerators in Compile += bower.taskValue
 
 // ----------------------------------------------------------------------
 // Liquibase
@@ -86,5 +98,5 @@ EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Managed
 // Project
 // ----------------------------------------------------------------------
 
-lazy val root = (project in file(".")).enablePlugins(SbtLiquibase)
+lazy val root = (project in file(".")).enablePlugins(SbtLiquibase, SbtBower)
 
